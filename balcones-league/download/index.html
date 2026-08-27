@@ -1,1 +1,90 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Balcones League</title><style>html,body{margin:0;background:#07070a;color:white;font-family:Arial,sans-serif}main{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box}.card{width:min(380px,100%);text-align:center}.logo{font-size:28px;font-weight:900;margin-bottom:8px}.sub{color:#9b9ba3;font-size:13px;margin-bottom:26px}.btn{display:block;text-decoration:none;color:white;font-weight:900;letter-spacing:.05em;padding:17px 18px;border-radius:15px;background:linear-gradient(115deg,#5c1cb5,#22bde5 52%,#a5102f);margin-bottom:12px}.small{font-size:11px;color:#777984;line-height:1.45}</style></head><body><main><div class="card"><div class="logo">BALCONES LEAGUE</div><div class="sub">Android · v2.3.1</div><a class="btn" href="./Balcones-League.apk" download="Balcones-League.apk" type="application/vnd.android.package-archive">DESCARGAR APK</a><div class="small">Si Android pregunta si quieres conservar o instalar este archivo, confirma. La app no procede de Google Play porque es una distribución privada.</div></div></main></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#07070a">
+  <title>Descargar Balcones League</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: #07070a;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    main {
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card { width: min(390px, 100%); text-align: center; }
+    .logo { font-size: 28px; font-weight: 900; margin-bottom: 8px; }
+    .sub { color: #9b9ba3; font-size: 13px; margin-bottom: 26px; }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 17px 18px;
+      border-radius: 15px;
+      color: white;
+      font-weight: 900;
+      letter-spacing: .05em;
+      text-decoration: none;
+    }
+    .primary {
+      background: linear-gradient(115deg, #5c1cb5, #22bde5 52%, #a5102f);
+      box-shadow: 0 10px 30px rgba(34, 189, 229, .18);
+    }
+    .direct {
+      margin-top: 12px;
+      border: 1px solid rgba(255, 255, 255, .18);
+      background: #15151b;
+      font-size: 12px;
+    }
+    .help {
+      margin-top: 20px;
+      color: #9b9ba3;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .help strong { color: #fff; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="card">
+      <div class="logo">BALCONES LEAGUE</div>
+      <div class="sub">Android · v2.3.1 · 11,7 MB</div>
+
+      <a
+        id="externalDownload"
+        class="btn primary"
+        href="intent://github.com/victorfel3f/victorfel3f.github.io/releases/download/balcones-league-v2.3.1/Balcones-League-v2.3.1.apk#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=https%3A%2F%2Fvictorfel3f.github.io%2Fbalcones-league%2Fdownload%2FBalcones-League.apk;end"
+      >ABRIR EN CHROME Y DESCARGAR</a>
+
+      <a
+        class="btn direct"
+        href="./Balcones-League.apk"
+        download="Balcones-League.apk"
+        type="application/vnd.android.package-archive"
+      >DESCARGA DIRECTA ALTERNATIVA</a>
+
+      <div class="help">
+        La descarga principal se abre fuera del navegador integrado para evitar que se quede al 100 %.
+        Al terminar, abre <strong>Balcones-League-v2.3.1.apk</strong> desde Descargas e instala la app.
+      </div>
+    </div>
+  </main>
+  <script>
+    const externalDownload = document.getElementById('externalDownload');
+    if (!/Android/i.test(navigator.userAgent)) {
+      externalDownload.href = './Balcones-League.apk';
+      externalDownload.download = 'Balcones-League.apk';
+      externalDownload.textContent = 'DESCARGAR APK';
+    }
+  </script>
+</body>
+</html>
