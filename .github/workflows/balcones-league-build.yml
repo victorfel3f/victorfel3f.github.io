@@ -49,17 +49,11 @@ jobs:
           gradle-version: '8.9'
           cache-disabled: true
 
-      - name: Restore signing key
+      - name: Restore encrypted signing key
         shell: bash
-        env:
-          BL_KEYSTORE_B64: ${{ secrets.BL_KEYSTORE_B64 }}
         run: |
           set -euo pipefail
-          if [ -z "$BL_KEYSTORE_B64" ]; then
-            echo 'Missing BL_KEYSTORE_B64 secret'
-            exit 1
-          fi
-          echo "$BL_KEYSTORE_B64" | base64 --decode > /tmp/balcones-league-release.jks
+          base64 --decode balcones-league/signing/keystore.b64 > /tmp/balcones-league-release.jks
 
       - name: Copy web app into Android assets
         shell: bash
@@ -79,7 +73,12 @@ jobs:
           BL_KEYSTORE_PASSWORD: ${{ secrets.BL_KEYSTORE_PASSWORD }}
           BL_KEY_ALIAS: balconesleague
           BL_KEY_PASSWORD: ${{ secrets.BL_KEYSTORE_PASSWORD }}
-        run: gradle --no-daemon :app:assembleRelease
+        run: |
+          if [ -z "$BL_KEYSTORE_PASSWORD" ]; then
+            echo 'Missing BL_KEYSTORE_PASSWORD secret'
+            exit 1
+          fi
+          gradle --no-daemon :app:assembleRelease
 
       - name: Publish APK in repository
         shell: bash
