@@ -1,0 +1,99 @@
+name: Build Balcones League APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'balcones-league/source.zip'
+      - '.github/workflows/balcones-league-build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Expand Balcones League source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f balcones-league/source.zip
+          rm -rf /tmp/blsrc
+          mkdir -p /tmp/blsrc
+          unzip -q -o balcones-league/source.zip -d /tmp/blsrc
+          cp -R /tmp/blsrc/. balcones-league/
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK 35
+        shell: bash
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.1'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+          cache-disabled: true
+
+      - name: Restore signing key
+        shell: bash
+        env:
+          BL_KEYSTORE_B64: ${{ secrets.BL_KEYSTORE_B64 }}
+        run: |
+          set -euo pipefail
+          if [ -z "$BL_KEYSTORE_B64" ]; then
+            echo 'Missing BL_KEYSTORE_B64 secret'
+            exit 1
+          fi
+          echo "$BL_KEYSTORE_B64" | base64 --decode > /tmp/balcones-league-release.jks
+
+      - name: Copy web app into Android assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          ASSETS='balcones-league/android-app/app/src/main/assets'
+          rm -rf "$ASSETS"
+          mkdir -p "$ASSETS/assets"
+          cp balcones-league/index.html "$ASSETS/index.html"
+          cp balcones-league/manifest.webmanifest "$ASSETS/manifest.webmanifest"
+          cp -R balcones-league/assets/. "$ASSETS/assets/"
+
+      - name: Build signed release APK
+        working-directory: balcones-league/android-app
+        env:
+          BL_KEYSTORE_FILE: /tmp/balcones-league-release.jks
+          BL_KEYSTORE_PASSWORD: ${{ secrets.BL_KEYSTORE_PASSWORD }}
+          BL_KEY_ALIAS: balconesleague
+          BL_KEY_PASSWORD: ${{ secrets.BL_KEYSTORE_PASSWORD }}
+        run: gradle --no-daemon :app:assembleRelease
+
+      - name: Publish APK in repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p balcones-league/download
+          cp balcones-league/android-app/app/build/outputs/apk/release/app-release.apk balcones-league/download/Balcones-League.apk
+          cp balcones-league/android-app/app/build/outputs/apk/release/app-release.apk balcones-league/download/Balcones-League-v2.3.apk
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add balcones-league
+          if git diff --cached --quiet; then
+            echo 'Nothing to commit'
+          else
+            git commit -m 'Balcones League v2.3 Android + APK [skip ci]'
+            git push
+          fi
