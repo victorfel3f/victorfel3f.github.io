@@ -1,0 +1,20 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.balconesleague.app-release-4:/values_values.arsc.flat",
+            "map": [
+                {
+                    "source": "/home/runner/work/victorfel3f.github.io/victorfel3f.github.io/balcones-league/android-app/app/src/main/res/values/styles.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "12",
+                        "endColumns": "12",
+                        "endOffsets": "688"
+                    }
+                }
+            ]
+        }
+    ]
+}

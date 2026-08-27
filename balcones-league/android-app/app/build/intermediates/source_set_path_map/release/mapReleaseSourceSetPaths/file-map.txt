@@ -1,0 +1,7 @@
+com.balconesleague.app-pngs-0 /home/runner/work/victorfel3f.github.io/victorfel3f.github.io/balcones-league/android-app/app/build/generated/res/pngs/release
+com.balconesleague.app-resValues-1 /home/runner/work/victorfel3f.github.io/victorfel3f.github.io/balcones-league/android-app/app/build/generated/res/resValues/release
+com.balconesleague.app-packageReleaseResources-2 /home/runner/work/victorfel3f.github.io/victorfel3f.github.io/balcones-league/android-app/app/build/intermediates/incremental/release/packageReleaseResources/merged.dir
+com.balconesleague.app-packageReleaseResources-3 /home/runner/work/victorfel3f.github.io/victorfel3f.github.io/balcones-league/android-app/app/build/intermediates/incremental/release/packageReleaseResources/stripped.dir
+com.balconesleague.app-release-4 /home/runner/work/victorfel3f.github.io/victorfel3f.github.io/balcones-league/android-app/app/build/intermediates/merged_res/release/mergeReleaseResources
+com.balconesleague.app-main-5 /home/runner/work/victorfel3f.github.io/victorfel3f.github.io/balcones-league/android-app/app/src/main/res
+com.balconesleague.app-release-6 /home/runner/work/victorfel3f.github.io/victorfel3f.github.io/balcones-league/android-app/app/src/release/res

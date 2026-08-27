@@ -1,0 +1,37 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.balconesleague.app'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.balconesleague.app'
+        minSdk 24
+        targetSdk 35
+        versionCode 1
+        versionName '2.3.0'
+    }
+
+    signingConfigs {
+        release {
+            storeFile file(System.getenv('BL_KEYSTORE_FILE') ?: 'balcones-league-release.jks')
+            storePassword System.getenv('BL_KEYSTORE_PASSWORD') ?: ''
+            keyAlias System.getenv('BL_KEY_ALIAS') ?: 'balconesleague'
+            keyPassword System.getenv('BL_KEY_PASSWORD') ?: ''
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
