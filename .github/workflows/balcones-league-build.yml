@@ -80,6 +80,23 @@ jobs:
           fi
           gradle --no-daemon :app:assembleRelease
 
+      - name: Publish APK as GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG='balcones-league-v2.3'
+          APK='balcones-league/android-app/app/build/outputs/apk/release/app-release.apk'
+          cp "$APK" /tmp/Balcones-League-v2.3.apk
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" /tmp/Balcones-League-v2.3.apk --clobber
+          else
+            gh release create "$TAG" /tmp/Balcones-League-v2.3.apk \
+              --title 'Balcones League v2.3' \
+              --notes 'APK Android privado de Balcones League. Instalable directamente, sin Google Play.'
+          fi
+
       - name: Publish APK in repository
         shell: bash
         run: |
