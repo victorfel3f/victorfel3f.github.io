@@ -26,6 +26,7 @@ jobs:
           rm -rf /tmp/blsrc
           mkdir -p /tmp/blsrc
           unzip -q -o balcones-league/source.zip -d /tmp/blsrc
+          rm -rf balcones-league/assets balcones-league/android-app
           cp -R /tmp/blsrc/. balcones-league/
 
       - name: Set up Java 17
@@ -86,15 +87,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          TAG='balcones-league-v2.3'
+          TAG='balcones-league-v2.3.1'
           APK='balcones-league/android-app/app/build/outputs/apk/release/app-release.apk'
-          cp "$APK" /tmp/Balcones-League-v2.3.apk
+          cp "$APK" /tmp/Balcones-League-v2.3.1.apk
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" /tmp/Balcones-League-v2.3.apk --clobber
+            gh release upload "$TAG" /tmp/Balcones-League-v2.3.1.apk --clobber
           else
-            gh release create "$TAG" /tmp/Balcones-League-v2.3.apk \
-              --title 'Balcones League v2.3' \
-              --notes 'APK Android privado de Balcones League. Instalable directamente, sin Google Play.'
+            gh release create "$TAG" /tmp/Balcones-League-v2.3.1.apk \
+              --title 'Balcones League v2.3.1' \
+              --notes 'Corrección de calidad de imágenes y transparencias de Balcones League. APK Android privado, instalable directamente sin Google Play.'
           fi
 
       - name: Publish APK in repository
@@ -103,13 +104,13 @@ jobs:
           set -euo pipefail
           mkdir -p balcones-league/download
           cp balcones-league/android-app/app/build/outputs/apk/release/app-release.apk balcones-league/download/Balcones-League.apk
-          cp balcones-league/android-app/app/build/outputs/apk/release/app-release.apk balcones-league/download/Balcones-League-v2.3.apk
+          cp balcones-league/android-app/app/build/outputs/apk/release/app-release.apk balcones-league/download/Balcones-League-v2.3.1.apk
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add balcones-league
           if git diff --cached --quiet; then
             echo 'Nothing to commit'
           else
-            git commit -m 'Balcones League v2.3 Android + APK [skip ci]'
+            git commit -m 'Balcones League v2.3.1 Android + APK [skip ci]'
             git push
           fi
