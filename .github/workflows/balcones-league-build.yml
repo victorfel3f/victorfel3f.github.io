@@ -30,7 +30,7 @@ jobs:
           rm -rf balcones-league/assets balcones-league/android-app
           cp -R /tmp/blsrc/. balcones-league/
 
-      - name: Apply latest Balcones League visual assets
+      - name: Apply latest Balcones League visual assets and fixes
         shell: bash
         run: |
           set -euo pipefail
@@ -85,11 +85,42 @@ jobs:
               out = base / folder / 'ic_launcher.png'
               out.parent.mkdir(parents=True, exist_ok=True)
               src.resize((size,size), Image.Resampling.LANCZOS).save(out, 'PNG', optimize=True)
+
+          index = Path('balcones-league/index.html')
+          html = index.read_text(encoding='utf-8')
+          old = '''.game-history-btn {
+  margin-top:20px; border:0; background-image:url("assets/img_04.png");
+  background-position:center; background-size:100% 100%; background-repeat:no-repeat;
+}'''
+          new = '''.game-history-btn {
+  margin-top:20px;
+  border:2px solid #fff;
+  background:#000;
+  box-shadow:none;
+}
+.game-history-btn span { color:#fff; }'''
+          if old in html:
+              html = html.replace(old, new, 1)
+          elif '.game-history-btn {' in html:
+              html = html.replace('</style>', '\n.game-history-btn{margin-top:20px!important;border:2px solid #fff!important;background:#000!important;background-image:none!important;box-shadow:none!important}.game-history-btn span{color:#fff!important}\n</style>', 1)
+          else:
+              raise SystemExit('game-history-btn CSS not found')
+          index.write_text(html, encoding='utf-8')
+
+          manifest = Path('balcones-league/android-app/app/src/main/AndroidManifest.xml')
+          xml = manifest.read_text(encoding='utf-8')
+          import re
+          if 'android:screenOrientation=' in xml:
+              xml = re.sub(r'android:screenOrientation="[^"]*"', 'android:screenOrientation="portrait"', xml, count=1)
+          else:
+              xml = xml.replace('android:name=".MainActivity"', 'android:name=".MainActivity"\n            android:screenOrientation="portrait"', 1)
+          manifest.write_text(xml, encoding='utf-8')
           PY
 
-          sed -i "s/versionCode [0-9][0-9]*/versionCode 3/" balcones-league/android-app/app/build.gradle
-          sed -i "s/versionName '[^']*'/versionName '2.3.2'/" balcones-league/android-app/app/build.gradle
-          grep -q 'setNavigationBarColor(Color.BLACK)' balcones-league/android-app/app/src/main/java/com/balconesleague/app/MainActivity.java
+          sed -i "s/versionCode [0-9][0-9]*/versionCode 4/" balcones-league/android-app/app/build.gradle
+          sed -i "s/versionName '[^']*'/versionName '2.3.3'/" balcones-league/android-app/app/build.gradle
+          grep -q 'android:screenOrientation="portrait"' balcones-league/android-app/app/src/main/AndroidManifest.xml
+          grep -q 'border:2px solid #fff' balcones-league/index.html
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -149,15 +180,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          TAG='balcones-league-v2.3.2'
+          TAG='balcones-league-v2.3.3'
           APK='balcones-league/android-app/app/build/outputs/apk/release/app-release.apk'
-          cp "$APK" /tmp/Balcones-League-v2.3.2.apk
+          cp "$APK" /tmp/Balcones-League-v2.3.3.apk
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" /tmp/Balcones-League-v2.3.2.apk --clobber
+            gh release upload "$TAG" /tmp/Balcones-League-v2.3.3.apk --clobber
           else
-            gh release create "$TAG" /tmp/Balcones-League-v2.3.2.apk \
-              --title 'Balcones League v2.3.2' \
-              --notes 'Banners de juego en alta calidad, botones actualizados, nuevo icono de app y barra de navegación Android negra.'
+            gh release create "$TAG" /tmp/Balcones-League-v2.3.3.apk \
+              --title 'Balcones League v2.3.3' \
+              --notes 'Botón Historial negro con borde y texto blancos. App bloqueada en orientación vertical.'
           fi
 
       - name: Publish APK in repository
@@ -166,13 +197,13 @@ jobs:
           set -euo pipefail
           mkdir -p balcones-league/download
           cp balcones-league/android-app/app/build/outputs/apk/release/app-release.apk balcones-league/download/Balcones-League.apk
-          cp balcones-league/android-app/app/build/outputs/apk/release/app-release.apk balcones-league/download/Balcones-League-v2.3.2.apk
+          cp balcones-league/android-app/app/build/outputs/apk/release/app-release.apk balcones-league/download/Balcones-League-v2.3.3.apk
 
           if [ -f balcones-league/download/index.html ]; then
             sed -i \
-              -e 's/v2\.3\.1/v2.3.2/g' \
-              -e 's/balcones-league-v2\.3\.1/balcones-league-v2.3.2/g' \
-              -e 's/Balcones-League-v2\.3\.1\.apk/Balcones-League-v2.3.2.apk/g' \
+              -e 's/v2\.3\.2/v2.3.3/g' \
+              -e 's/balcones-league-v2\.3\.2/balcones-league-v2.3.3/g' \
+              -e 's/Balcones-League-v2\.3\.2\.apk/Balcones-League-v2.3.3.apk/g' \
               balcones-league/download/index.html
           fi
 
@@ -182,6 +213,6 @@ jobs:
           if git diff --cached --quiet; then
             echo 'Nothing to commit'
           else
-            git commit -m 'Balcones League v2.3.2 Android + APK [skip ci]'
+            git commit -m 'Balcones League v2.3.3 Android + APK [skip ci]'
             git push
           fi
