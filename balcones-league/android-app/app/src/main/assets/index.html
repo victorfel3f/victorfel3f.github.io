@@ -1673,7 +1673,7 @@ function setTexture(btn){
   btn.style.setProperty('background-position','center','important');
   btn.style.setProperty('background-repeat','no-repeat','important');
   btn.dataset.blTexture=tex;
-}")`; }
+}
 function setImg(img,src,alt=''){ if(img){ img.src=src||''; img.alt=alt; } }
 function fmtPct(value){ if(!isFinite(value)) return '0%'; return `${value.toFixed(1)}%`; }
 function clamp(n,min,max){ return Math.max(min,Math.min(max,n)); }
