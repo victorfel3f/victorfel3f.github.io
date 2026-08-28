@@ -1141,7 +1141,8 @@ body {
 
 <style id="bl-action-buttons-v241">
 .game-start-btn,
-.fresh-action-btn{
+.fresh-action-btn,
+.bl-textured-action{
   --bl-button-texture:url("assets/action-button-1.png");
   border:0!important;
   overflow:hidden!important;
@@ -1153,7 +1154,8 @@ body {
   color:#fff!important;
 }
 .game-start-btn span,
-.fresh-action-btn span{
+.fresh-action-btn span,
+.bl-textured-action span{
   position:relative!important;
   z-index:1!important;
   color:#fff!important;
@@ -1664,7 +1666,12 @@ function randomTexture(){ return BUTTON_TEXTURES[Math.floor(Math.random()*BUTTON
 function setTexture(btn){
   if(!btn) return;
   const tex=randomTexture();
+  btn.classList.add('bl-textured-action');
   btn.style.setProperty('--bl-button-texture',`url("${tex}")`);
+  btn.style.setProperty('background-image',`url("${tex}")`,'important');
+  btn.style.setProperty('background-size','100% 100%','important');
+  btn.style.setProperty('background-position','center','important');
+  btn.style.setProperty('background-repeat','no-repeat','important');
   btn.dataset.blTexture=tex;
 }")`; }
 function setImg(img,src,alt=''){ if(img){ img.src=src||''; img.alt=alt; } }
