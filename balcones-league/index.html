@@ -1032,15 +1032,24 @@ body {
 .tie-cancel{display:block;margin:10px auto 0;border:0;background:transparent;color:#9fa5b3;font-size:12px;font-weight:800}
 
 
-.game-history-btn {
-  margin-top:20px !important;
-  border:2px solid #fff !important;
-  background:#000 !important;
-  background-image:none !important;
-  box-shadow:none !important;
-  color:#fff !important;
+.game-history-btn{
+  margin-top:20px!important;
+  border:2px solid #fff!important;
+  background:#000!important;
+  background-image:none!important;
+  box-shadow:none!important;
+  color:#fff!important;
 }
-.game-history-btn span { color:#fff !important; }
+.game-history-btn span{color:#fff!important;}
+
+.game-start-btn,
+.fresh-action-btn{
+  background-color:#000!important;
+  background-image:url("assets/img_36.webp")!important;
+  background-size:100% 100%!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+}
 
 </style>
 
@@ -1404,7 +1413,7 @@ body {
       <h1 class="territory-title">DOMINA 3 POSTAS</h1>
       <p class="territory-help">Pulsa una posta para asignar quién la domina. El primero que controle 3 gana.</p>
       <div class="territory-map" id="territoryMap">
-        <img src="assets/img_06.png" alt="Pista Territorio Triples">
+        <img src="assets/img_40.webp" alt="Pista Territorio Triples">
         <button class="territory-post" data-post="1" style="left:85.8%;top:72.2%" aria-label="Posta 1"></button>
         <button class="territory-post" data-post="2" style="left:73.6%;top:24.4%" aria-label="Posta 2"></button>
         <button class="territory-post" data-post="3" style="left:50.1%;top:14.0%" aria-label="Posta 3"></button>
@@ -1637,7 +1646,15 @@ function getHistoryStore(){ try{ const v=JSON.parse(localStorage.getItem(STORAGE
 function saveHistoryStore(store){ localStorage.setItem(STORAGE_KEY, JSON.stringify(store)); }
 function allEntries(){ const store=getHistoryStore(); return Object.values(store).flat().map(e=>({ ...e, gameId:e.gameId||null })).sort((a,b)=>new Date(a.date)-new Date(b.date)); }
 function randomTexture(){ return BUTTON_TEXTURES[Math.floor(Math.random()*BUTTON_TEXTURES.length)]; }
-function setTexture(btn){ if(!btn || btn.classList.contains('fresh-action-btn')) return; btn.style.backgroundImage=`url("${randomTexture()}")`; }
+function setTexture(btn){
+  if(!btn) return;
+  const tex=randomTexture();
+  btn.style.setProperty('background-image',`url("${tex}")`,'important');
+  btn.style.setProperty('background-size','100% 100%','important');
+  btn.style.setProperty('background-position','center','important');
+  btn.style.setProperty('background-repeat','no-repeat','important');
+  btn.style.setProperty('background-color','#000','important');
+}
 function setImg(img,src,alt=''){ if(img){ img.src=src||''; img.alt=alt; } }
 function fmtPct(value){ if(!isFinite(value)) return '0%'; return `${value.toFixed(1)}%`; }
 function clamp(n,min,max){ return Math.max(min,Math.min(max,n)); }
