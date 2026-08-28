@@ -109,7 +109,8 @@ jobs:
           button_override = '''
           <style id="bl-action-buttons-v241">
           .game-start-btn,
-          .fresh-action-btn{
+          .fresh-action-btn,
+          .bl-textured-action{
             --bl-button-texture:url("assets/action-button-1.png");
             border:0!important;
             overflow:hidden!important;
@@ -121,7 +122,8 @@ jobs:
             color:#fff!important;
           }
           .game-start-btn span,
-          .fresh-action-btn span{
+          .fresh-action-btn span,
+          .bl-textured-action span{
             position:relative!important;
             z-index:1!important;
             color:#fff!important;
@@ -152,7 +154,12 @@ jobs:
           new_set = '''function setTexture(btn){
             if(!btn) return;
             const tex=randomTexture();
+            btn.classList.add('bl-textured-action');
             btn.style.setProperty('--bl-button-texture',`url("${tex}")`);
+            btn.style.setProperty('background-image',`url("${tex}")`,'important');
+            btn.style.setProperty('background-size','100% 100%','important');
+            btn.style.setProperty('background-position','center','important');
+            btn.style.setProperty('background-repeat','no-repeat','important');
             btn.dataset.blTexture=tex;
           }'''
           html, set_count = re.subn(r'function setTexture\(btn\)\{.*?\}', new_set, html, count=1, flags=re.S)
