@@ -162,9 +162,10 @@ jobs:
             btn.style.setProperty('background-repeat','no-repeat','important');
             btn.dataset.blTexture=tex;
           }'''
-          html, set_count = re.subn(r'function setTexture\(btn\)\{.*?\}', new_set, html, count=1, flags=re.S)
-          if set_count != 1:
-              raise SystemExit('setTexture function not found')
+          old_set = 'function setTexture(btn){ if(!btn || btn.classList.contains(\'fresh-action-btn\')) return; btn.style.backgroundImage=`url("${randomTexture()}")`; }'
+          if html.count(old_set) != 1:
+              raise SystemExit('exact setTexture function not found')
+          html = html.replace(old_set, new_set, 1)
 
           # Preload all four textures before any flow opens.
           preload_marker = 'function randomTexture(){'
@@ -280,6 +281,23 @@ jobs:
               out.parent.mkdir(parents=True, exist_ok=True)
               src.resize((size,size), Image.Resampling.LANCZOS).save(out, 'PNG', optimize=True)
           PY
+
+          # Parse every inline script before compiling. This prevents a broken
+          # JavaScript bundle from ever reaching another APK/release.
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          html=Path('balcones-league/index.html').read_text(encoding='utf-8')
+          scripts=re.findall(r'<script(?:\s[^>]*)?>([\s\S]*?)</script>',html,flags=re.I)
+          if not scripts:
+              raise SystemExit('no inline scripts found')
+          for i,script in enumerate(scripts):
+              Path(f'/tmp/bl-inline-{i}.js').write_text(script,encoding='utf-8')
+          print(f'extracted {len(scripts)} inline scripts')
+          PY
+          for script in /tmp/bl-inline-*.js; do
+            node --check "$script"
+          done
 
           sed -i "s/versionCode [0-9][0-9]*/versionCode 6/" balcones-league/android-app/app/build.gradle
           sed -i "s/versionName '[^']*'/versionName '2.4.1'/" balcones-league/android-app/app/build.gradle
