@@ -48,10 +48,23 @@ public class MainActivity extends Activity {
         webView.loadUrl("file:///android_asset/index.html");
     }
 
-    @Override
-    public void onBackPressed() {
+    private void fallbackBack() {
         if (webView != null && webView.canGoBack()) webView.goBack();
         else super.onBackPressed();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (webView == null) {
+            fallbackBack();
+            return;
+        }
+        webView.evaluateJavascript(
+            "(function(){try{return !!(window.blHandleAndroidBack && window.blHandleAndroidBack());}catch(e){return false;}})()",
+            handled -> {
+                if (!"true".equals(handled)) fallbackBack();
+            }
+        );
     }
 
     @Override

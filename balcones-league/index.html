@@ -350,7 +350,7 @@ body {
 .game-action-btn span { color:#fff; font-size:18px; font-weight:900; letter-spacing:.035em; }
 .game-start-btn { border:0; background:#5b31d7 center/cover no-repeat; box-shadow:0 9px 26px rgba(84,37,190,.28); }
 .game-history-btn {
-  margin-top:20px; border:0; background-image:url("assets/img_04.png");
+  margin-top:20px; border:0; background-image:url("");
   background-position:center; background-size:100% 100%; background-repeat:no-repeat;
 }
 .flow-header-art,.small-game-banner { display:flex; align-items:center; justify-content:center; }
@@ -989,7 +989,7 @@ body {
   display:flex;align-items:center;justify-content:center;
   width:min(72vw,310px);height:58px;margin:22px auto 0;padding:0 18px;
   border:0;border-radius:19px;overflow:hidden;
-  background-image:url("assets/img_05.webp")!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;
+  background-image:url("assets/action-button-1.png")!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;
   color:#fff;font:900 20px/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   letter-spacing:.01em;box-shadow:0 9px 24px rgba(91,42,216,.18);
   appearance:none;-webkit-appearance:none;
@@ -1041,15 +1041,6 @@ body {
   color:#fff!important;
 }
 .game-history-btn span{color:#fff!important;}
-
-.game-start-btn,
-.fresh-action-btn{
-  background-color:#000!important;
-  background-image:url("assets/img_36.webp")!important;
-  background-size:100% 100%!important;
-  background-position:center!important;
-  background-repeat:no-repeat!important;
-}
 
 </style>
 
@@ -1147,6 +1138,29 @@ body {
   <meta name="theme-color" content="#000000">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
+
+<style id="bl-action-buttons-v241">
+.game-start-btn,
+.fresh-action-btn{
+  --bl-button-texture:url("assets/action-button-1.png");
+  border:0!important;
+  overflow:hidden!important;
+  background-color:#000!important;
+  background-image:var(--bl-button-texture)!important;
+  background-size:100% 100%!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  color:#fff!important;
+}
+.game-start-btn span,
+.fresh-action-btn span{
+  position:relative!important;
+  z-index:1!important;
+  color:#fff!important;
+  text-shadow:0 1px 5px rgba(0,0,0,.72)!important;
+}
+</style>
+
 </head>
 <body>
 
@@ -1468,7 +1482,7 @@ const games = [{"id": "21", "title": "21", "covers": ["assets/img_09.webp"]}, {"
 const tools = [{"id": "calcular_porcentajes", "title": "Calcular Porcentajes", "cover": "assets/img_19.webp"}, {"id": "numero_aleatorio", "title": "Número Aleatorio", "cover": "assets/img_20.webp"}, {"id": "orden_aleatorio", "title": "Orden Aleatorio", "cover": "assets/img_21.webp"}, {"id": "ruleta_juegos", "title": "Ruleta de Juegos", "cover": "assets/img_22.webp"}];
 const historyItems = [{"id": "palmares", "title": "Palmarés", "cover": "assets/img_23.webp"}, {"id": "historial", "title": "Historial", "cover": "assets/img_24.webp"}, {"id": "ranking", "title": "Ranking", "cover": "assets/img_25.jpg"}];
 const GAME_BANNERS = {"21": "assets/img_26.svg", "Mentiroso": "assets/img_27.svg", "Tiros Libres": "assets/img_28.svg", "Territorio Triples": "assets/img_29.svg", "El Reloj": "assets/img_30.svg", "28": "assets/img_31.svg", "Triples": "assets/img_32.svg", "Porcentajes": "assets/img_33.svg", "26": "assets/img_34.svg", "Horse": "assets/img_35.svg"};
-const BUTTON_TEXTURES = ["assets/img_36.webp", "assets/img_37.webp", "assets/img_38.webp", "assets/img_39.webp"];
+const BUTTON_TEXTURES = ["assets/action-button-1.png", "assets/action-button-2.png", "assets/action-button-3.png", "assets/action-button-4.png"];
 const PLAYERS = [
   { id:"victor", name:"Victor", c1:"#5C1CB5", c2:"#B04CFF" },
   { id:"matu",   name:"Matu",   c1:"#13E6C1", c2:"#37BDF8" },
@@ -1645,16 +1659,14 @@ function getGame(id){ return games.find(g=>g.id===id); }
 function getHistoryStore(){ try{ const v=JSON.parse(localStorage.getItem(STORAGE_KEY)); return v&&typeof v==='object'?v:{}; }catch{ return {}; } }
 function saveHistoryStore(store){ localStorage.setItem(STORAGE_KEY, JSON.stringify(store)); }
 function allEntries(){ const store=getHistoryStore(); return Object.values(store).flat().map(e=>({ ...e, gameId:e.gameId||null })).sort((a,b)=>new Date(a.date)-new Date(b.date)); }
+BUTTON_TEXTURES.forEach(src=>{const image=new Image();image.src=src;});
 function randomTexture(){ return BUTTON_TEXTURES[Math.floor(Math.random()*BUTTON_TEXTURES.length)]; }
 function setTexture(btn){
   if(!btn) return;
   const tex=randomTexture();
-  btn.style.setProperty('background-image',`url("${tex}")`,'important');
-  btn.style.setProperty('background-size','100% 100%','important');
-  btn.style.setProperty('background-position','center','important');
-  btn.style.setProperty('background-repeat','no-repeat','important');
-  btn.style.setProperty('background-color','#000','important');
-}
+  btn.style.setProperty('--bl-button-texture',`url("${tex}")`);
+  btn.dataset.blTexture=tex;
+}")`; }
 function setImg(img,src,alt=''){ if(img){ img.src=src||''; img.alt=alt; } }
 function fmtPct(value){ if(!isFinite(value)) return '0%'; return `${value.toFixed(1)}%`; }
 function clamp(n,min,max){ return Math.max(min,Math.min(max,n)); }
@@ -2612,6 +2624,35 @@ document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
   }
 
   boot();
+})();
+</script>
+
+
+<script id="bl-android-back-v241">
+(function(){
+  const overlaySelector=[
+    '.game-detail-view.active','.ft-config-view.active','.liar-config-view.active',
+    '.player-select-view.active','.draw-view.active','.scores-view.active',
+    '.game-history-view.active','.meta-view.active','.player-detail-view.active',
+    '.number-tool-view.active','.percent-tool-view.active','.roulette-view.active',
+    '.territory-view.active','.winner-view.active'
+  ].join(',');
+  window.blHandleAndroidBack=function(){
+    const active=document.querySelector(overlaySelector);
+    if(active){
+      const back=active.querySelector('.overlay-back');
+      if(back){back.click();return true;}
+      const home=active.querySelector('.overlay-home');
+      if(home){home.click();return true;}
+      const homeButton=document.getElementById('homeBtn');
+      if(homeButton){homeButton.click();return true;}
+    }
+    if(document.querySelector('#searchView.active,#playersHubView.active')){
+      const homeButton=document.getElementById('homeBtn');
+      if(homeButton){homeButton.click();return true;}
+    }
+    return false;
+  };
 })();
 </script>
 
