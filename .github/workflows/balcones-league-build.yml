@@ -30,7 +30,7 @@ jobs:
           rm -rf balcones-league/assets balcones-league/android-app
           cp -R /tmp/blsrc/. balcones-league/
 
-      - name: Apply Balcones League v2.4.1 fixes
+      - name: Apply Balcones League v2.4.2 fixes
         shell: bash
         run: |
           set -euo pipefail
@@ -107,7 +107,7 @@ jobs:
           # All action buttons use the new files through one CSS custom property.
           # New filenames avoid both stale WebView caches and the old broken assets.
           button_override = '''
-          <style id="bl-action-buttons-v241">
+          <style id="bl-action-buttons-v242">
           .game-start-btn,
           .fresh-action-btn,
           .bl-textured-action{
@@ -190,7 +190,7 @@ jobs:
           # When no overlay is open, Search/Jugadores returns to Inicio; only then
           # does the native Activity close the app.
           android_back = '''
-          <script id="bl-android-back-v241">
+          <script id="bl-android-back-v242">
           (function(){
             const overlaySelector=[
               '.game-detail-view.active','.ft-config-view.active','.liar-config-view.active',
@@ -299,8 +299,8 @@ jobs:
             node --check "$script"
           done
 
-          sed -i "s/versionCode [0-9][0-9]*/versionCode 6/" balcones-league/android-app/app/build.gradle
-          sed -i "s/versionName '[^']*'/versionName '2.4.1'/" balcones-league/android-app/app/build.gradle
+          sed -i "s/versionCode [0-9][0-9]*/versionCode 7/" balcones-league/android-app/app/build.gradle
+          sed -i "s/versionName '[^']*'/versionName '2.4.2'/" balcones-league/android-app/app/build.gradle
 
           grep -q 'assets/img_40.webp' balcones-league/index.html
           grep -q 'assets/action-button-1.png' balcones-league/index.html
@@ -311,7 +311,7 @@ jobs:
           grep -q 'android:screenOrientation="portrait"' balcones-league/android-app/app/src/main/AndroidManifest.xml
           grep -q 'SCREEN_ORIENTATION_PORTRAIT' balcones-league/android-app/app/src/main/java/com/balconesleague/app/MainActivity.java
           grep -q 'evaluateJavascript' balcones-league/android-app/app/src/main/java/com/balconesleague/app/MainActivity.java
-          grep -q "versionName '2.4.1'" balcones-league/android-app/app/build.gradle
+          grep -q "versionName '2.4.2'" balcones-league/android-app/app/build.gradle
 
           python3 - <<'PY'
           from PIL import Image
@@ -379,15 +379,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          TAG='balcones-league-v2.4.1'
+          TAG='balcones-league-v2.4.2'
           APK='balcones-league/android-app/app/build/outputs/apk/release/app-release.apk'
-          cp "$APK" /tmp/Balcones-League-v2.4.1.apk
+          cp "$APK" /tmp/Balcones-League-v2.4.2.apk
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" /tmp/Balcones-League-v2.4.1.apk --clobber
+            gh release upload "$TAG" /tmp/Balcones-League-v2.4.2.apk --clobber
           else
-            gh release create "$TAG" /tmp/Balcones-League-v2.4.1.apk \
-              --title 'Balcones League v2.4.1' \
-              --notes 'Corrige de raíz los botones: elimina los recursos anteriores e integra los cuatro PNG originales recortados en alta resolución. Añade navegación interna con el botón Atrás de Android.'
+            gh release create "$TAG" /tmp/Balcones-League-v2.4.2.apk \
+              --title 'Balcones League v2.4.2' \
+              --notes 'Corrige el bloqueo de la pantalla de introducción después de iniciar sesión. Mantiene los cuatro botones PNG en alta resolución y la navegación interna con Atrás de Android.'
           fi
 
       - name: Publish direct APK
@@ -396,13 +396,13 @@ jobs:
           set -euo pipefail
           mkdir -p balcones-league/download
           cp balcones-league/android-app/app/build/outputs/apk/release/app-release.apk balcones-league/download/Balcones-League.apk
-          cp balcones-league/android-app/app/build/outputs/apk/release/app-release.apk balcones-league/download/Balcones-League-v2.4.1.apk
+          cp balcones-league/android-app/app/build/outputs/apk/release/app-release.apk balcones-league/download/Balcones-League-v2.4.2.apk
 
           if [ -f balcones-league/download/index.html ]; then
             sed -i \
-              -e 's/v2\.4 ·/v2.4.1 ·/g' \
-              -e 's#/balcones-league-v2\.4/#/balcones-league-v2.4.1/#g' \
-              -e 's/Balcones-League-v2\.4\.apk/Balcones-League-v2.4.1.apk/g' \
+              -e 's/v2\.4\.1 ·/v2.4.2 ·/g' \
+              -e 's#/balcones-league-v2\.4\.1/#/balcones-league-v2.4.2/#g' \
+              -e 's/Balcones-League-v2\.4\.1\.apk/Balcones-League-v2.4.2.apk/g' \
               balcones-league/download/index.html
           fi
 
@@ -410,6 +410,6 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add balcones-league
           if ! git diff --cached --quiet; then
-            git commit -m 'Balcones League v2.4.1 Android + APK [skip ci]'
+            git commit -m 'Balcones League v2.4.2 Android + APK [skip ci]'
             git push
           fi
