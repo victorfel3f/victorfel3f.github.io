@@ -30,11 +30,12 @@ jobs:
           rm -rf balcones-league/assets balcones-league/android-app
           cp -R /tmp/blsrc/. balcones-league/
 
-      - name: Apply latest Balcones League visual assets and fixes
+      - name: Apply Balcones League v2.4 fixes
         shell: bash
         run: |
           set -euo pipefail
 
+          # High-quality game banners already supplied by Victor.
           cp balcones-league/asset-inputs/21.svg balcones-league/assets/img_26.svg
           cp balcones-league/asset-inputs/mentiroso.svg balcones-league/assets/img_27.svg
           cp balcones-league/asset-inputs/tiros_libres.svg balcones-league/assets/img_28.svg
@@ -59,68 +60,130 @@ jobs:
             -e 's#assets/img_35.png#assets/img_35.svg#g' \
             balcones-league/index.html
 
+          # The four supplied high-quality action button textures.
           base64 --decode balcones-league/asset-inputs/button1.webp.b64 > balcones-league/assets/img_36.webp
           base64 --decode balcones-league/asset-inputs/button2.webp.b64 > balcones-league/assets/img_37.webp
           base64 --decode balcones-league/asset-inputs/button3.webp.b64 > balcones-league/assets/img_38.webp
           base64 --decode balcones-league/asset-inputs/button4.webp.b64 > balcones-league/assets/img_39.webp
 
+          # New high-quality Territories court supplied for v2.4.
+          cat balcones-league/asset-inputs/territory-map.b64.part0* | base64 --decode > balcones-league/assets/img_40.webp
+
+          # Current app icon.
           base64 --decode balcones-league/asset-inputs/app-icon.webp.b64 > /tmp/bl-app-icon.webp
           python3 -m pip install --quiet pillow
           python3 - <<'PY'
-          from PIL import Image
           from pathlib import Path
-
-          src = Image.open('/tmp/bl-app-icon.webp').convert('RGBA')
-          src.resize((512,512), Image.Resampling.LANCZOS).save('balcones-league/assets/icon-512.webp', 'WEBP', quality=96, method=6)
-          src.resize((192,192), Image.Resampling.LANCZOS).save('balcones-league/assets/icon-192.webp', 'WEBP', quality=96, method=6)
-          sizes = {
-              'mipmap-mdpi': 48,
-              'mipmap-hdpi': 72,
-              'mipmap-xhdpi': 96,
-              'mipmap-xxhdpi': 144,
-              'mipmap-xxxhdpi': 192,
-          }
-          base = Path('balcones-league/android-app/app/src/main/res')
-          for folder, size in sizes.items():
-              out = base / folder / 'ic_launcher.png'
-              out.parent.mkdir(parents=True, exist_ok=True)
-              src.resize((size,size), Image.Resampling.LANCZOS).save(out, 'PNG', optimize=True)
+          from PIL import Image
+          import re
 
           index = Path('balcones-league/index.html')
           html = index.read_text(encoding='utf-8')
-          old = '''.game-history-btn {
-  margin-top:20px; border:0; background-image:url("assets/img_04.png");
-  background-position:center; background-size:100% 100%; background-repeat:no-repeat;
-}'''
-          new = '''.game-history-btn {
-  margin-top:20px;
-  border:2px solid #fff;
-  background:#000;
-  box-shadow:none;
-}
-.game-history-btn span { color:#fff; }'''
-          if old in html:
-              html = html.replace(old, new, 1)
-          elif '.game-history-btn {' in html:
-              html = html.replace('</style>', '\n.game-history-btn{margin-top:20px!important;border:2px solid #fff!important;background:#000!important;background-image:none!important;box-shadow:none!important}.game-history-btn span{color:#fff!important}\n</style>', 1)
+
+          # Replace the old low-quality Territories image.
+          html = html.replace('assets/img_06.png', 'assets/img_40.webp')
+
+          # Keep game history black with white border/text.
+          history_override = '''
+          .game-history-btn{
+            margin-top:20px!important;
+            border:2px solid #fff!important;
+            background:#000!important;
+            background-image:none!important;
+            box-shadow:none!important;
+            color:#fff!important;
+          }
+          .game-history-btn span{color:#fff!important;}
+          '''
+
+          # All action buttons must always use one of the four supplied textures.
+          button_override = '''
+          .game-start-btn,
+          .fresh-action-btn{
+            background-color:#000!important;
+            background-image:url("assets/img_36.webp")!important;
+            background-size:100% 100%!important;
+            background-position:center!important;
+            background-repeat:no-repeat!important;
+          }
+          '''
+
+          if '</style>' not in html:
+              raise SystemExit('style block not found')
+          html = html.replace('</style>', history_override + button_override + '\n</style>', 1)
+
+          old_set = 'function setTexture(btn){ if(!btn || btn.classList.contains(\'fresh-action-btn\')) return; btn.style.backgroundImage=`url("${randomTexture()}")`; }'
+          new_set = '''function setTexture(btn){
+            if(!btn) return;
+            const tex=randomTexture();
+            btn.style.setProperty('background-image',`url("${tex}")`,'important');
+            btn.style.setProperty('background-size','100% 100%','important');
+            btn.style.setProperty('background-position','center','important');
+            btn.style.setProperty('background-repeat','no-repeat','important');
+            btn.style.setProperty('background-color','#000','important');
+          }'''
+          if old_set in html:
+              html = html.replace(old_set, new_set, 1)
           else:
-              raise SystemExit('game-history-btn CSS not found')
+              pattern = r"function setTexture\(btn\)\{\s*if\(!btn\s*\|\|\s*btn\.classList\.contains\('fresh-action-btn'\)\)\s*return;\s*btn\.style\.backgroundImage=`url\(\\?\"\$\{randomTexture\(\)\}\\?\"\)`;\s*\}"
+              html, n = re.subn(pattern, new_set, html, count=1)
+              if n == 0:
+                  raise SystemExit('setTexture function not found')
+
+          if "if(id==='numero_aleatorio'){ setTexture(randGenerateBtn);" not in html:
+              raise SystemExit('random number texture hook missing')
+          if "setTexture(gameStartBtn);" not in html:
+              raise SystemExit('game start texture hook missing')
+          if "setTexture(drawNextBtn);" not in html:
+              marker = "drawNextBtn.addEventListener('click'"
+              if marker in html:
+                  html = html.replace(marker, "setTexture(drawNextBtn);\n" + marker, 1)
+              else:
+                  marker = "const drawNextBtn=document.getElementById('drawNextBtn');"
+                  if marker in html:
+                      html = html.replace(marker, marker + "\nsetTexture(drawNextBtn);", 1)
+
           index.write_text(html, encoding='utf-8')
 
+          # Portrait-only at Android manifest and runtime level.
           manifest = Path('balcones-league/android-app/app/src/main/AndroidManifest.xml')
           xml = manifest.read_text(encoding='utf-8')
-          import re
           if 'android:screenOrientation=' in xml:
               xml = re.sub(r'android:screenOrientation="[^"]*"', 'android:screenOrientation="portrait"', xml, count=1)
           else:
               xml = xml.replace('android:name=".MainActivity"', 'android:name=".MainActivity"\n            android:screenOrientation="portrait"', 1)
           manifest.write_text(xml, encoding='utf-8')
+
+          java = Path('balcones-league/android-app/app/src/main/java/com/balconesleague/app/MainActivity.java')
+          srcjava = java.read_text(encoding='utf-8')
+          if 'import android.content.pm.ActivityInfo;' not in srcjava:
+              srcjava = srcjava.replace('import android.app.Activity;\n', 'import android.app.Activity;\nimport android.content.pm.ActivityInfo;\n', 1)
+          lock = 'setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);'
+          if lock not in srcjava:
+              srcjava = srcjava.replace('super.onCreate(savedInstanceState);', 'super.onCreate(savedInstanceState);\n        ' + lock, 1)
+          java.write_text(srcjava, encoding='utf-8')
+
+          # Recreate launcher/PWA icons.
+          src = Image.open('/tmp/bl-app-icon.webp').convert('RGBA')
+          src.resize((512,512), Image.Resampling.LANCZOS).save('balcones-league/assets/icon-512.webp', 'WEBP', quality=96, method=6)
+          src.resize((192,192), Image.Resampling.LANCZOS).save('balcones-league/assets/icon-192.webp', 'WEBP', quality=96, method=6)
+          sizes = {'mipmap-mdpi':48,'mipmap-hdpi':72,'mipmap-xhdpi':96,'mipmap-xxhdpi':144,'mipmap-xxxhdpi':192}
+          base = Path('balcones-league/android-app/app/src/main/res')
+          for folder, size in sizes.items():
+              out = base / folder / 'ic_launcher.png'
+              out.parent.mkdir(parents=True, exist_ok=True)
+              src.resize((size,size), Image.Resampling.LANCZOS).save(out, 'PNG', optimize=True)
           PY
 
-          sed -i "s/versionCode [0-9][0-9]*/versionCode 4/" balcones-league/android-app/app/build.gradle
-          sed -i "s/versionName '[^']*'/versionName '2.3.3'/" balcones-league/android-app/app/build.gradle
+          sed -i "s/versionCode [0-9][0-9]*/versionCode 5/" balcones-league/android-app/app/build.gradle
+          sed -i "s/versionName '[^']*'/versionName '2.4'/" balcones-league/android-app/app/build.gradle
+
+          grep -q 'assets/img_40.webp' balcones-league/index.html
+          grep -q 'assets/img_36.webp' balcones-league/index.html
+          grep -q 'background-image:none!important' balcones-league/index.html
           grep -q 'android:screenOrientation="portrait"' balcones-league/android-app/app/src/main/AndroidManifest.xml
-          grep -q 'border:2px solid #fff' balcones-league/index.html
+          grep -q 'SCREEN_ORIENTATION_PORTRAIT' balcones-league/android-app/app/src/main/java/com/balconesleague/app/MainActivity.java
+          grep -q "versionName '2.4'" balcones-league/android-app/app/build.gradle
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -143,7 +206,7 @@ jobs:
           gradle-version: '8.9'
           cache-disabled: true
 
-      - name: Restore encrypted signing key
+      - name: Restore signing key
         shell: bash
         run: |
           set -euo pipefail
@@ -168,51 +231,47 @@ jobs:
           BL_KEY_ALIAS: balconesleague
           BL_KEY_PASSWORD: ${{ secrets.BL_KEYSTORE_PASSWORD }}
         run: |
-          if [ -z "$BL_KEYSTORE_PASSWORD" ]; then
-            echo 'Missing BL_KEYSTORE_PASSWORD secret'
-            exit 1
-          fi
+          set -euo pipefail
+          test -n "$BL_KEYSTORE_PASSWORD"
           gradle --no-daemon :app:assembleRelease
 
-      - name: Publish APK as GitHub Release
+      - name: Publish GitHub Release
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          TAG='balcones-league-v2.3.3'
+          TAG='balcones-league-v2.4'
           APK='balcones-league/android-app/app/build/outputs/apk/release/app-release.apk'
-          cp "$APK" /tmp/Balcones-League-v2.3.3.apk
+          cp "$APK" /tmp/Balcones-League-v2.4.apk
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" /tmp/Balcones-League-v2.3.3.apk --clobber
+            gh release upload "$TAG" /tmp/Balcones-League-v2.4.apk --clobber
           else
-            gh release create "$TAG" /tmp/Balcones-League-v2.3.3.apk \
-              --title 'Balcones League v2.3.3' \
-              --notes 'Botón Historial negro con borde y texto blancos. App bloqueada en orientación vertical.'
+            gh release create "$TAG" /tmp/Balcones-League-v2.4.apk \
+              --title 'Balcones League v2.4' \
+              --notes 'Botones de acción unificados en alta calidad y nueva pista de Territorios. Mantiene Historial negro y orientación vertical.'
           fi
 
-      - name: Publish APK in repository
+      - name: Publish direct APK
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p balcones-league/download
           cp balcones-league/android-app/app/build/outputs/apk/release/app-release.apk balcones-league/download/Balcones-League.apk
-          cp balcones-league/android-app/app/build/outputs/apk/release/app-release.apk balcones-league/download/Balcones-League-v2.3.3.apk
+          cp balcones-league/android-app/app/build/outputs/apk/release/app-release.apk balcones-league/download/Balcones-League-v2.4.apk
 
           if [ -f balcones-league/download/index.html ]; then
             sed -i \
-              -e 's/v2\.3\.2/v2.3.3/g' \
-              -e 's/balcones-league-v2\.3\.2/balcones-league-v2.3.3/g' \
-              -e 's/Balcones-League-v2\.3\.2\.apk/Balcones-League-v2.3.3.apk/g' \
+              -e 's/v2\.3\.3/v2.4/g' \
+              -e 's/balcones-league-v2\.3\.3/balcones-league-v2.4/g' \
+              -e 's/Balcones-League-v2\.3\.3\.apk/Balcones-League-v2.4.apk/g' \
               balcones-league/download/index.html
           fi
 
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add balcones-league
-          if git diff --cached --quiet; then
-            echo 'Nothing to commit'
-          else
-            git commit -m 'Balcones League v2.3.3 Android + APK [skip ci]'
+          if ! git diff --cached --quiet; then
+            git commit -m 'Balcones League v2.4 Android + APK [skip ci]'
             git push
           fi
