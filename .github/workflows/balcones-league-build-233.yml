@@ -1,0 +1,203 @@
+name: Build Balcones League v2.3.3 APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'balcones-league/build-trigger-233.txt'
+      - '.github/workflows/balcones-league-build-233.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-android-233:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Expand source
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/blsrc
+          mkdir -p /tmp/blsrc
+          unzip -q -o balcones-league/source.zip -d /tmp/blsrc
+          rm -rf balcones-league/assets balcones-league/android-app
+          cp -R /tmp/blsrc/. balcones-league/
+
+      - name: Apply current artwork and requested fixes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cp balcones-league/asset-inputs/21.svg balcones-league/assets/img_26.svg
+          cp balcones-league/asset-inputs/mentiroso.svg balcones-league/assets/img_27.svg
+          cp balcones-league/asset-inputs/tiros_libres.svg balcones-league/assets/img_28.svg
+          cp balcones-league/asset-inputs/territorio_triples.svg balcones-league/assets/img_29.svg
+          cp balcones-league/asset-inputs/el_reloj.svg balcones-league/assets/img_30.svg
+          cp balcones-league/asset-inputs/28.svg balcones-league/assets/img_31.svg
+          cp balcones-league/asset-inputs/triples.svg balcones-league/assets/img_32.svg
+          cp balcones-league/asset-inputs/porcentajes.svg balcones-league/assets/img_33.svg
+          cp balcones-league/asset-inputs/26.svg balcones-league/assets/img_34.svg
+          cp balcones-league/asset-inputs/horse.svg balcones-league/assets/img_35.svg
+
+          sed -i \
+            -e 's#assets/img_26.png#assets/img_26.svg#g' \
+            -e 's#assets/img_27.png#assets/img_27.svg#g' \
+            -e 's#assets/img_28.png#assets/img_28.svg#g' \
+            -e 's#assets/img_29.png#assets/img_29.svg#g' \
+            -e 's#assets/img_30.png#assets/img_30.svg#g' \
+            -e 's#assets/img_31.png#assets/img_31.svg#g' \
+            -e 's#assets/img_32.png#assets/img_32.svg#g' \
+            -e 's#assets/img_33.png#assets/img_33.svg#g' \
+            -e 's#assets/img_34.png#assets/img_34.svg#g' \
+            -e 's#assets/img_35.png#assets/img_35.svg#g' \
+            balcones-league/index.html
+
+          base64 --decode balcones-league/asset-inputs/button1.webp.b64 > balcones-league/assets/img_36.webp
+          base64 --decode balcones-league/asset-inputs/button2.webp.b64 > balcones-league/assets/img_37.webp
+          base64 --decode balcones-league/asset-inputs/button3.webp.b64 > balcones-league/assets/img_38.webp
+          base64 --decode balcones-league/asset-inputs/button4.webp.b64 > balcones-league/assets/img_39.webp
+          base64 --decode balcones-league/asset-inputs/app-icon.webp.b64 > /tmp/bl-app-icon.webp
+
+          python3 -m pip install --quiet pillow
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import re
+
+          index = Path('balcones-league/index.html')
+          html = index.read_text(encoding='utf-8')
+          override = '''
+          .game-history-btn {
+            margin-top:20px !important;
+            border:2px solid #fff !important;
+            background:#000 !important;
+            background-image:none !important;
+            box-shadow:none !important;
+            color:#fff !important;
+          }
+          .game-history-btn span { color:#fff !important; }
+          '''
+          if 'background-image:none !important' not in html:
+              html = html.replace('</style>', override + '\n</style>', 1)
+          index.write_text(html, encoding='utf-8')
+
+          manifest = Path('balcones-league/android-app/app/src/main/AndroidManifest.xml')
+          xml = manifest.read_text(encoding='utf-8')
+          if 'android:screenOrientation=' in xml:
+              xml = re.sub(r'android:screenOrientation="[^"]*"', 'android:screenOrientation="portrait"', xml, count=1)
+          else:
+              xml = xml.replace('android:name=".MainActivity"', 'android:name=".MainActivity"\n            android:screenOrientation="portrait"', 1)
+          manifest.write_text(xml, encoding='utf-8')
+
+          java = Path('balcones-league/android-app/app/src/main/java/com/balconesleague/app/MainActivity.java')
+          srcjava = java.read_text(encoding='utf-8')
+          if 'import android.content.pm.ActivityInfo;' not in srcjava:
+              srcjava = srcjava.replace('import android.app.Activity;\n', 'import android.app.Activity;\nimport android.content.pm.ActivityInfo;\n', 1)
+          lock = 'setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);'
+          if lock not in srcjava:
+              srcjava = srcjava.replace('super.onCreate(savedInstanceState);', 'super.onCreate(savedInstanceState);\n        ' + lock, 1)
+          java.write_text(srcjava, encoding='utf-8')
+
+          src = Image.open('/tmp/bl-app-icon.webp').convert('RGBA')
+          src.resize((512,512), Image.Resampling.LANCZOS).save('balcones-league/assets/icon-512.webp', 'WEBP', quality=96, method=6)
+          src.resize((192,192), Image.Resampling.LANCZOS).save('balcones-league/assets/icon-192.webp', 'WEBP', quality=96, method=6)
+          sizes = {'mipmap-mdpi':48,'mipmap-hdpi':72,'mipmap-xhdpi':96,'mipmap-xxhdpi':144,'mipmap-xxxhdpi':192}
+          base = Path('balcones-league/android-app/app/src/main/res')
+          for folder, size in sizes.items():
+              out = base / folder / 'ic_launcher.png'
+              out.parent.mkdir(parents=True, exist_ok=True)
+              src.resize((size,size), Image.Resampling.LANCZOS).save(out, 'PNG', optimize=True)
+          PY
+
+          sed -i "s/versionCode [0-9][0-9]*/versionCode 4/" balcones-league/android-app/app/build.gradle
+          sed -i "s/versionName '[^']*'/versionName '2.3.3'/" balcones-league/android-app/app/build.gradle
+
+          grep -q 'background-image:none !important' balcones-league/index.html
+          grep -q 'android:screenOrientation="portrait"' balcones-league/android-app/app/src/main/AndroidManifest.xml
+          grep -q 'SCREEN_ORIENTATION_PORTRAIT' balcones-league/android-app/app/src/main/java/com/balconesleague/app/MainActivity.java
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK 35
+        shell: bash
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.1'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+          cache-disabled: true
+
+      - name: Restore signing key
+        shell: bash
+        run: base64 --decode balcones-league/signing/keystore.b64 > /tmp/balcones-league-release.jks
+
+      - name: Copy web app into Android assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          ASSETS='balcones-league/android-app/app/src/main/assets'
+          rm -rf "$ASSETS"
+          mkdir -p "$ASSETS/assets"
+          cp balcones-league/index.html "$ASSETS/index.html"
+          cp balcones-league/manifest.webmanifest "$ASSETS/manifest.webmanifest"
+          cp -R balcones-league/assets/. "$ASSETS/assets/"
+
+      - name: Build signed release APK
+        working-directory: balcones-league/android-app
+        env:
+          BL_KEYSTORE_FILE: /tmp/balcones-league-release.jks
+          BL_KEYSTORE_PASSWORD: ${{ secrets.BL_KEYSTORE_PASSWORD }}
+          BL_KEY_ALIAS: balconesleague
+          BL_KEY_PASSWORD: ${{ secrets.BL_KEYSTORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$BL_KEYSTORE_PASSWORD"
+          gradle --no-daemon :app:assembleRelease
+
+      - name: Publish GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG='balcones-league-v2.3.3'
+          APK='balcones-league/android-app/app/build/outputs/apk/release/app-release.apk'
+          cp "$APK" /tmp/Balcones-League-v2.3.3.apk
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" /tmp/Balcones-League-v2.3.3.apk --clobber
+          else
+            gh release create "$TAG" /tmp/Balcones-League-v2.3.3.apk --title 'Balcones League v2.3.3' --notes 'Botón Historial negro con borde y texto blancos. Orientación vertical bloqueada.'
+          fi
+
+      - name: Publish direct APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p balcones-league/download
+          cp balcones-league/android-app/app/build/outputs/apk/release/app-release.apk balcones-league/download/Balcones-League.apk
+          cp balcones-league/android-app/app/build/outputs/apk/release/app-release.apk balcones-league/download/Balcones-League-v2.3.3.apk
+          if [ -f balcones-league/download/index.html ]; then
+            sed -i -e 's/v2\.3\.2/v2.3.3/g' -e 's/balcones-league-v2\.3\.2/balcones-league-v2.3.3/g' -e 's/Balcones-League-v2\.3\.2\.apk/Balcones-League-v2.3.3.apk/g' balcones-league/download/index.html
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add balcones-league
+          if ! git diff --cached --quiet; then
+            git commit -m 'Balcones League v2.3.3 Android + APK [skip ci]'
+            git push
+          fi
