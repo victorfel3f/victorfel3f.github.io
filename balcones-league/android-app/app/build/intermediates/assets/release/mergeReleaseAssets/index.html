@@ -1030,6 +1030,32 @@ body {
 .tie-player{height:52px;border:2px solid rgba(255,255,255,.8);border-radius:16px;background:linear-gradient(135deg,var(--c1),var(--c2));color:#fff;font-size:17px;font-weight:950}
 .tie-keep{width:100%;height:48px;margin-top:10px;border:2px solid #fff;border-radius:15px;background:#000;color:#fff;font-size:14px;font-weight:900}
 .tie-cancel{display:block;margin:10px auto 0;border:0;background:transparent;color:#9fa5b3;font-size:12px;font-weight:800}
+.ft-resolution{position:fixed;inset:0;z-index:170;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.84);padding:18px 14px calc(18px + env(safe-area-inset-bottom));box-sizing:border-box}
+.ft-resolution.active{display:flex}
+.ft-resolution-card{width:min(94vw,430px);max-height:min(86dvh,720px);overflow-y:auto;border-radius:24px;border:1px solid rgba(255,255,255,.16);background:#0d0e13;padding:18px 14px 14px;box-shadow:0 24px 70px rgba(0,0,0,.65)}
+.ft-resolution-title{font-size:25px;font-weight:950;text-align:center;line-height:1.05;margin-bottom:6px}
+.ft-resolution-sub{font-size:12px;color:#b8bdca;text-align:center;line-height:1.4;margin:0 auto 14px;max-width:350px}
+.ft-main-attempts-list,.ft-tiebreak-rows{display:grid;gap:9px}
+.ft-main-attempt-row,.ft-tiebreak-row{border:1px solid rgba(255,255,255,.12);border-radius:17px;background:#15161d;padding:11px 12px}
+.ft-main-attempt-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px}
+.ft-resolution-player{font-size:16px;font-weight:950;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ft-main-attempt-row label{display:flex;align-items:center;gap:7px;color:#dce0ea;font-size:13px;font-weight:900}
+.ft-main-attempt-row select,.ft-tiebreak-field input{height:40px;border:1px solid rgba(255,255,255,.18);border-radius:12px;background:#08090d;color:#fff;font-size:17px;font-weight:950;text-align:center}
+.ft-main-attempt-row select{min-width:68px;padding:0 8px}
+.ft-tiebreak-section{display:none;margin-top:15px;padding-top:14px;border-top:1px solid rgba(255,255,255,.12)}
+.ft-tiebreak-section.active{display:block}
+.ft-tiebreak-title{font-size:18px;font-weight:950;text-align:center;margin-bottom:5px}
+.ft-tiebreak-help{font-size:11px;line-height:1.35;color:#aeb4c2;text-align:center;margin-bottom:11px}
+.ft-winner-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-bottom:11px}
+.ft-winner-choice{min-height:44px;border:1px solid rgba(255,255,255,.3);border-radius:13px;background:#1a1b23;color:#fff;font-size:13px;font-weight:950;padding:7px}
+.ft-winner-choice.selected{border:2px solid #fff;background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 0 18px color-mix(in srgb,var(--c2) 38%,transparent)}
+.ft-tiebreak-player{font-size:14px;font-weight:950;margin-bottom:8px}
+.ft-tiebreak-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ft-tiebreak-field{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:6px;color:#c6cad5;font-size:10px;font-weight:900}
+.ft-tiebreak-field input{width:100%;min-width:0;padding:0 5px}
+.ft-resolution-error{min-height:18px;margin-top:9px;color:#ff7895;font-size:11px;font-weight:800;text-align:center}
+.ft-resolution-confirm{width:100%;height:58px!important;margin:2px auto 0!important;border-radius:18px!important}
+.ft-resolution-cancel{display:block;margin:10px auto 0;border:0;background:transparent;color:#9fa5b3;font-size:12px;font-weight:800}
 
 
 .game-history-btn{
@@ -1460,6 +1486,23 @@ body {
     </div>
   </div>
 
+  <div class="ft-resolution" id="ftResolution" aria-hidden="true">
+    <div class="ft-resolution-card">
+      <div class="ft-resolution-title">DATOS DE TIROS LIBRES</div>
+      <div class="ft-resolution-sub" id="ftResolutionSub"></div>
+      <div class="ft-main-attempts-list" id="ftMainAttemptsList"></div>
+      <div class="ft-tiebreak-section" id="ftTiebreakSection">
+        <div class="ft-tiebreak-title">DESEMPATE</div>
+        <div class="ft-tiebreak-help">Elige quién ganó e introduce cuántos metió y cuántos tiró cada jugador en el desempate.</div>
+        <div class="ft-winner-choices" id="ftWinnerChoices"></div>
+        <div class="ft-tiebreak-rows" id="ftTiebreakRows"></div>
+      </div>
+      <div class="ft-resolution-error" id="ftResolutionError"></div>
+      <button class="balcones-btn ft-resolution-confirm" id="ftResolutionConfirm" type="button"><span>REGISTRAR RESULTADO</span></button>
+      <button class="ft-resolution-cancel" id="ftResolutionCancel" type="button">CANCELAR</button>
+    </div>
+  </div>
+
   <section class="winner-view" id="winnerView" aria-hidden="true">
     <div class="winner-burst burst-a"></div>
     <div class="winner-burst burst-b"></div>
@@ -1604,6 +1647,15 @@ const tieChooser=document.getElementById('tieChooser');
 const tiePlayerList=document.getElementById('tiePlayerList');
 const tieKeepBtn=document.getElementById('tieKeepBtn');
 const tieCancelBtn=document.getElementById('tieCancelBtn');
+const ftResolution=document.getElementById('ftResolution');
+const ftResolutionSub=document.getElementById('ftResolutionSub');
+const ftMainAttemptsList=document.getElementById('ftMainAttemptsList');
+const ftTiebreakSection=document.getElementById('ftTiebreakSection');
+const ftWinnerChoices=document.getElementById('ftWinnerChoices');
+const ftTiebreakRows=document.getElementById('ftTiebreakRows');
+const ftResolutionError=document.getElementById('ftResolutionError');
+const ftResolutionConfirm=document.getElementById('ftResolutionConfirm');
+const ftResolutionCancel=document.getElementById('ftResolutionCancel');
 const territoryStatus=document.getElementById('territoryStatus');
 const territoryChooser=document.getElementById('territoryChooser');
 const territoryChooserTitle=document.getElementById('territoryChooserTitle');
@@ -1639,6 +1691,7 @@ let territoryOwners={};
 let territoryActivePost=null;
 let pendingTieEntry=null;
 let pendingTieIds=[];
+let ftResolutionState=null;
 let currentRankingMetric='titles';
 const TERRITORY_POSTS=[1,2,3,4,5];
 const TERRITORY_WIN_TARGET=3;
@@ -1658,6 +1711,7 @@ const RANKING_GAME_SHORT={
 
 function getPlayer(id){ return PLAYERS.find(p=>p.id===id); }
 function getGame(id){ return games.find(g=>g.id===id); }
+function ftAttemptsForEntry(entry,id){ const byPlayer=entry?.ftAttemptsByPlayer||{}; return Number(byPlayer[id]??entry?.ftAttempts??0); }
 function getHistoryStore(){ try{ const v=JSON.parse(localStorage.getItem(STORAGE_KEY)); return v&&typeof v==='object'?v:{}; }catch{ return {}; } }
 function saveHistoryStore(store){ localStorage.setItem(STORAGE_KEY, JSON.stringify(store)); }
 function allEntries(){ const store=getHistoryStore(); return Object.values(store).flat().map(e=>({ ...e, gameId:e.gameId||null })).sort((a,b)=>new Date(a.date)-new Date(b.date)); }
@@ -1685,7 +1739,7 @@ function updateBottomNav(active){ [homeBtn,searchBtn,playersBtn].forEach(b=>b.cl
 function showHome(){ hideAllOverlays(); catalogEl.classList.remove('hidden'); searchView.classList.remove('active'); playersHubView.classList.remove('active'); updateBottomNav('home'); pageEl.scrollTop=0; }
 function showSearch(){ hideAllOverlays(); catalogEl.classList.add('hidden'); searchView.classList.add('active'); playersHubView.classList.remove('active'); updateBottomNav('search'); pageEl.scrollTop=0; renderSearch(searchInput.value); setTimeout(()=>searchInput.focus({preventScroll:true}),60); }
 function showPlayersHub(){ hideAllOverlays(); catalogEl.classList.add('hidden'); searchView.classList.remove('active'); playersHubView.classList.add('active'); updateBottomNav('players'); renderPlayersHub(); pageEl.scrollTop=0; }
-function goHome(){ clearDrawTimers(); currentGame=null; currentMeta=null; currentPlayerId=null; selectedIds=new Set(); winnerView.classList.remove('active'); showHome(); }
+function goHome(){ clearDrawTimers(); closeFtResolution(); currentGame=null; currentMeta=null; currentPlayerId=null; selectedIds=new Set(); winnerView.classList.remove('active'); showHome(); }
 document.querySelectorAll('.overlay-home').forEach(btn=>btn.addEventListener('click', goHome));
 homeBtn.addEventListener('click', showHome); searchBtn.addEventListener('click', showSearch); playersBtn.addEventListener('click', showPlayersHub);
 
@@ -1732,7 +1786,7 @@ function computeStats(){
       if(!st.perGame[gid]) st.perGame[gid]={count:0,totalScore:0,bestScore:null,wins:0,ftMade:0,ftAttempts:0,pctSum:0,bestPct:null,mode:entry.mode};
       const raw=Number(entry.scores[id]||0);
       st.perGame[gid].count++; st.perGame[gid].totalScore += raw; st.perGame[gid].bestScore = st.perGame[gid].bestScore===null?raw:Math.max(st.perGame[gid].bestScore,raw);
-      if(entry.mode==='fixedPercent'){ const att=Number(entry.ftAttempts||0); if(att>0){ const pct=raw/att*100; st.ftMade += raw; st.ftAttempts += att; st.perGame[gid].ftMade += raw; st.perGame[gid].ftAttempts += att; st.perGame[gid].pctSum += pct; st.perGame[gid].bestPct = st.perGame[gid].bestPct===null?pct:Math.max(st.perGame[gid].bestPct,pct);} }
+      if(entry.mode==='fixedPercent'){ const att=ftAttemptsForEntry(entry,id); if(att>0){ const pct=raw/att*100; st.ftMade += raw; st.ftAttempts += att; st.perGame[gid].ftMade += raw; st.perGame[gid].ftAttempts += att; st.perGame[gid].pctSum += pct; st.perGame[gid].bestPct = st.perGame[gid].bestPct===null?pct:Math.max(st.perGame[gid].bestPct,pct);} }
       if(entry.mode==='variablePercent'){ const att=Number((entry.percentageAttempts||{})[id]||0); if(att>0){ const pct=raw/att*100; st.ftMade += raw; st.ftAttempts += att; st.perGame[gid].ftMade += raw; st.perGame[gid].ftAttempts += att; st.perGame[gid].pctSum += pct; st.perGame[gid].bestPct = st.perGame[gid].bestPct===null?pct:Math.max(st.perGame[gid].bestPct,pct);} }
       const recentPos=posIndex>=0?posIndex+1:null;
       st.recent.push({ date:entry.date, gameId:gid, gameTitle:entry.gameTitle||getGame(gid)?.title||gid, pos:recentPos, won:winnerIds.includes(id), score:raw, mode:entry.mode, winnerScore:winnerDisplayScore(entry,id) });
@@ -1985,12 +2039,12 @@ function renderOrderRows(){
 function runDraw(){ currentOrder=shuffle(PLAYERS.filter(p=>selectedIds.has(p.id))); if(flowMode==='game'&&currentGame?.id==='porcentajes'){ percentageAttempts={}; currentOrder.forEach(p=>percentageAttempts[p.id]=6+Math.floor(Math.random()*7)); }
   setHeaderArt(drawHeaderArt,flowMode); drawTitle.innerHTML=flowMode==='orderTool'?'ORDEN<br>SORTEADO':(currentGame?.id==='territorio_triples'?'SORTEO<br>INICIAL':'ORDEN<br>DE JUEGO'); if(currentGame?.id==='territorio_triples') prepareTerritorySetup(); setTexture(drawNextBtn); drawResult.classList.remove('active'); drawRunning.style.display='flex'; drawAgainBtn.textContent='VOLVER A ELEGIR'; drawNextBtn.style.display=flowMode==='orderTool'?'none':'flex'; orderedPlayers.innerHTML=''; activateView(drawView); let tick=0,pool=currentOrder; clearDrawTimers(); drawInterval=setInterval(()=>{ drawName.textContent=pool[tick%pool.length].name.toUpperCase(); tick++; },82); drawTimer=setTimeout(()=>{ clearDrawTimers(); drawRunning.style.display='none'; renderOrderRows(); drawResult.classList.add('active'); resetViewScroll(drawView); },2000); }
 drawBack.addEventListener('click',()=>openPlayerSelector(flowMode)); drawAgainBtn.addEventListener('click',()=>openPlayerSelector(flowMode)); drawNextBtn.addEventListener('click',()=>{ if(flowMode==='game'){ if(currentGame?.id==='territorio_triples') openTerritoryBoard(); else openScores(); } });
-function scoreConfigForGame(game){ if(!game) return {max:30,target:30,type:'score'}; if(game.id==='21') return {max:21,target:21,type:'score'}; if(game.id==='26') return {max:26,target:26,type:'score'}; if(game.id==='28') return {max:20,target:20,type:'score'}; if(game.id==='el_reloj') return {max:9,target:9,type:'score'}; if(game.id==='tiros_libres') return {max:selectedFtAttempts||10,target:null,type:'fixedPercent'}; if(game.id==='porcentajes') return {max:null,target:null,type:'variablePercent'}; if(game.id==='horse') return {max:5,target:null,type:'horse'}; if(game.id==='mentiroso') return {max:selectedLiarLives||3,target:null,type:'liar'}; return {max:30,target:30,type:'score'}; }
-function scoreDisplay(id,value,cfg){ if(cfg.type==='fixedPercent'){ const a=selectedFtAttempts||0, p=a?value/a*100:0; return `${fmtPct(p)}`; } if(cfg.type==='variablePercent'){ const a=percentageAttempts[id]||0, p=a?value/a*100:0; return `${fmtPct(p)}`; } return `${value}`; }
+function scoreConfigForGame(game){ if(!game) return {max:30,target:30,type:'score'}; if(game.id==='21') return {max:21,target:21,type:'score'}; if(game.id==='26') return {max:26,target:26,type:'score'}; if(game.id==='28') return {max:28,target:28,type:'score'}; if(game.id==='triples') return {max:22,target:22,type:'score'}; if(game.id==='el_reloj') return {max:9,target:9,type:'score'}; if(game.id==='tiros_libres') return {max:6,target:6,type:'fixedPercent'}; if(game.id==='porcentajes') return {max:null,target:null,type:'variablePercent'}; if(game.id==='horse') return {max:5,target:null,type:'horse'}; if(game.id==='mentiroso') return {max:selectedLiarLives||3,target:null,type:'liar'}; return {max:30,target:30,type:'score'}; }
+function scoreDisplay(id,value,cfg){ if(cfg.type==='fixedPercent') return `${value} / 6 aciertos`; if(cfg.type==='variablePercent'){ const a=percentageAttempts[id]||0, p=a?value/a*100:0; return `${fmtPct(p)}`; } return `${value}`; }
 function scorePickerHtml(p,max,value=0){ return `<div class="score-picker" style="--c1:${p.c1};--c2:${p.c2}"><div class="score-window" data-score-window="${p.id}" data-max="${max}" data-value="${value}"><div class="score-cell prev edge-empty" data-prev="${p.id}"></div><div class="score-cell current" data-current="${p.id}">${value}</div><div class="score-cell next" data-next="${p.id}">${max>0?1:''}</div></div><input class="score-native-lock" data-score-slider="${p.id}" type="range" min="0" max="${max}" value="${value}" step="1" dir="rtl" aria-label="Puntuación de ${p.name}"></div>`; }
 
 function updateScoreWindow(id,value,max){ const prev=scoresList.querySelector(`[data-prev="${id}"]`), cur=scoresList.querySelector(`[data-current="${id}"]`), next=scoresList.querySelector(`[data-next="${id}"]`); if(prev){ prev.textContent=value>0?value-1:''; prev.classList.toggle('edge-empty',value<=0); } if(cur) cur.textContent=value; if(next){ next.textContent=value<max?value+1:''; next.classList.toggle('edge-empty',value>=max); } }
-function standardScoreCard(p,cfg){ let max=cfg.max; if(cfg.type==='variablePercent') max=percentageAttempts[p.id]; scores[p.id]=0; let topNote=''; if(cfg.type==='fixedPercent') topNote=`<div class="attempts-note">TIROS LIBRES <strong>${selectedFtAttempts}</strong></div>`; if(cfg.type==='variablePercent') topNote=`<div class="percent-shot-inline">TIROS LIBRES <strong>${max}</strong></div>`; return `<div class="score-card" data-player="${p.id}" style="--c1:${p.c1};--c2:${p.c2}"><div class="score-player">${p.name.toUpperCase()}</div>${topNote}${scorePickerHtml(p,max,0)}<div class="score-meta" data-score-readout="${p.id}">${cfg.type==='score'?'':scoreDisplay(p.id,0,cfg)}</div></div>`; }
+function standardScoreCard(p,cfg){ let max=cfg.max; if(cfg.type==='variablePercent') max=percentageAttempts[p.id]; scores[p.id]=0; let topNote=''; if(cfg.type==='fixedPercent') topNote=`<div class="attempts-note">OBJETIVO <strong>6</strong> · MÁXIMO ${selectedFtAttempts} TIROS</div>`; if(cfg.type==='variablePercent') topNote=`<div class="percent-shot-inline">TIROS LIBRES <strong>${max}</strong></div>`; return `<div class="score-card" data-player="${p.id}" style="--c1:${p.c1};--c2:${p.c2}"><div class="score-player">${p.name.toUpperCase()}</div>${topNote}${scorePickerHtml(p,max,0)}<div class="score-meta" data-score-readout="${p.id}">${cfg.type==='score'?'':scoreDisplay(p.id,0,cfg)}</div></div>`; }
 function horseCard(p){ horseState[p.id]=[false,false,false,false,false]; scores[p.id]=0; const letters=['H','O','R','S','E']; return `<div class="score-card special-card" data-player="${p.id}" style="--c1:${p.c1};--c2:${p.c2}"><div class="score-player">${p.name.toUpperCase()}</div><div class="horse-letters">${letters.map((l,i)=>`<button class="horse-letter" type="button" data-horse-player="${p.id}" data-horse-index="${i}">${l}</button>`).join('')}</div><div class="special-status" data-special-status="${p.id}">0 / 5 letras</div></div>`; }
 function liarCard(p){ liarState[p.id]=Array(selectedLiarLives).fill(true); scores[p.id]=selectedLiarLives; return `<div class="score-card special-card" data-player="${p.id}" style="--c1:${p.c1};--c2:${p.c2}"><div class="score-player">${p.name.toUpperCase()}</div><div class="life-hearts">${Array.from({length:selectedLiarLives},(_,i)=>`<button class="life-heart" type="button" data-life-player="${p.id}" data-life-index="${i}" aria-label="Vida ${i+1}">♥</button>`).join('')}</div><div class="special-status" data-special-status="${p.id}">${selectedLiarLives} vidas</div></div>`; }
 function openScores(){ if(!currentGame) return; manuallyFinished=false; scores={}; horseState={}; liarState={}; eliminationOrder=[]; finishGameBtn.classList.remove('finished'); finishGameBtn.textContent='FINALIZAR JUEGO'; setTexture(registerResultsBtn); registerResultsBtn.disabled=true; setImg(scoresGameBanner,GAME_BANNERS[currentGame.title],currentGame.title); const cfg=scoreConfigForGame(currentGame); if(cfg.type==='horse'){ scoresList.innerHTML=currentOrder.map(horseCard).join(''); finishGameBtn.style.display='none'; registerHint.textContent='Completa HORSE para eliminar jugadores. Podrás registrar cuando quede uno.'; } else if(cfg.type==='liar'){ scoresList.innerHTML=currentOrder.map(liarCard).join(''); finishGameBtn.style.display='none'; registerHint.textContent='Pulsa corazones para perder vidas. Podrás registrar cuando quede uno.'; } else { scoresList.innerHTML=currentOrder.map(p=>standardScoreCard(p,cfg)).join(''); finishGameBtn.style.display=''; if(cfg.type==='variablePercent') registerHint.textContent='Cada jugador tiene sus tiros sorteados. Introduce aciertos y finaliza el juego.'; else if(cfg.type==='fixedPercent') registerHint.textContent='Introduce los aciertos y finaliza el juego.'; }
@@ -2018,7 +2072,7 @@ scoresList.addEventListener('click', e=>{ const hb=e.target.closest('[data-horse
 });
 scoresBack.addEventListener('click',()=>{ scoresView.classList.remove('active'); drawView.classList.add('active'); resetViewScroll(drawView); });
 finishGameBtn.addEventListener('click',()=>{ manuallyFinished=true; finishGameBtn.classList.add('finished'); finishGameBtn.textContent='FINALIZADO ✓'; updateRegisterAvailability(); });
-function updateRegisterAvailability(){ if(!currentGame) return; const cfg=scoreConfigForGame(currentGame); let can=false; if(cfg.type==='score'){ can=manuallyFinished||Object.values(scores).some(v=>v>=cfg.target); registerHint.textContent=can?'Resultados listos para registrar.':`Alguien debe llegar a ${cfg.target} o puedes finalizar el juego.`; } else if(cfg.type==='fixedPercent'||cfg.type==='variablePercent'){ can=manuallyFinished; if(can) registerHint.textContent='Resultados listos para registrar.'; } else if(cfg.type==='horse'){ const alive=currentOrder.filter(p=>(horseState[p.id]||[]).filter(Boolean).length<5); can=alive.length===1; registerHint.textContent=can?`${alive[0].name} es el último jugador en pie.`:'Elimina jugadores completando HORSE hasta que quede uno.'; } else if(cfg.type==='liar'){ const alive=currentOrder.filter(p=>(liarState[p.id]||[]).filter(Boolean).length>0); can=alive.length===1; registerHint.textContent=can?`${alive[0].name} es el último con vidas.`:'Elimina vidas hasta que quede un único jugador.'; } registerResultsBtn.disabled=!can; }
+function updateRegisterAvailability(){ if(!currentGame) return; const cfg=scoreConfigForGame(currentGame); let can=false; if(cfg.type==='score'){ can=manuallyFinished||Object.values(scores).some(v=>v>=cfg.target); registerHint.textContent=can?'Resultados listos para registrar.':`Alguien debe llegar a ${cfg.target} o puedes finalizar el juego.`; } else if(cfg.type==='fixedPercent'){ const reached=Object.values(scores).some(v=>v>=6); can=manuallyFinished||reached; registerHint.textContent=can?(reached?'Resultado listo. Al registrar indicarás 6 de cuántos tiros.':'Resultados listos para registrar.'):'Alguien debe llegar a 6 o puedes finalizar el juego.'; } else if(cfg.type==='variablePercent'){ can=manuallyFinished; if(can) registerHint.textContent='Resultados listos para registrar.'; } else if(cfg.type==='horse'){ const alive=currentOrder.filter(p=>(horseState[p.id]||[]).filter(Boolean).length<5); can=alive.length===1; registerHint.textContent=can?`${alive[0].name} es el último jugador en pie.`:'Elimina jugadores completando HORSE hasta que quede uno.'; } else if(cfg.type==='liar'){ const alive=currentOrder.filter(p=>(liarState[p.id]||[]).filter(Boolean).length>0); can=alive.length===1; registerHint.textContent=can?`${alive[0].name} es el último con vidas.`:'Elimina vidas hasta que quede un único jugador.'; } registerResultsBtn.disabled=!can; }
 function metricForPlayer(id,cfg){ const v=Number(scores[id]||0); if(cfg.type==='fixedPercent') return selectedFtAttempts?v/selectedFtAttempts:0; if(cfg.type==='variablePercent'){ const a=percentageAttempts[id]||1; return v/a; } return v; }
 function buildRanking(cfg){ if(cfg.type==='horse'){ const alive=currentOrder.filter(p=>(horseState[p.id]||[]).filter(Boolean).length<5); const winner=alive[0]; const eliminated=[...eliminationOrder].reverse().filter(id=>id!==winner?.id); return [winner?.id,...eliminated].filter(Boolean).map(id=>({id,metric:0,score:Number(scores[id]||0)})); } if(cfg.type==='liar'){ const alive=currentOrder.filter(p=>(liarState[p.id]||[]).filter(Boolean).length>0); const winner=alive[0]; const eliminated=[...eliminationOrder].reverse().filter(id=>id!==winner?.id); return [winner?.id,...eliminated].filter(Boolean).map(id=>({id,metric:Number(scores[id]||0),score:Number(scores[id]||0)})); } return currentOrder.map(p=>({id:p.id,metric:metricForPlayer(p.id,cfg),score:Number(scores[p.id]||0)})).sort((a,b)=>{ if(b.metric!==a.metric) return b.metric-a.metric; if(b.score!==a.score) return b.score-a.score; return currentOrder.findIndex(p=>p.id===a.id)-currentOrder.findIndex(p=>p.id===b.id); }); }
 function persistResultEntry(entry,winnerIds){
@@ -2032,13 +2086,68 @@ function openTieChooser(entry,ids){ pendingTieEntry=entry; pendingTieIds=[...ids
 tiePlayerList.addEventListener('click',e=>{ const b=e.target.closest('[data-tie-player]'); if(!b||!pendingTieEntry)return; const entry=pendingTieEntry; const id=b.dataset.tiePlayer; closeTieChooser(); persistResultEntry(entry,[id]); });
 tieKeepBtn.addEventListener('click',()=>{ if(!pendingTieEntry)return; const entry=pendingTieEntry, ids=[...pendingTieIds]; closeTieChooser(); persistResultEntry(entry,ids); });
 tieCancelBtn.addEventListener('click',closeTieChooser);
-function registerResults(){ if(!currentGame||registerResultsBtn.disabled) return; const cfg=scoreConfigForGame(currentGame); const ranking=buildRanking(cfg); let candidateWinnerIds=[]; if(cfg.type==='horse'||cfg.type==='liar') candidateWinnerIds=ranking.length?[ranking[0].id]:[]; else { const best=ranking[0]?.metric ?? 0; candidateWinnerIds=ranking.filter(r=>Math.abs(r.metric-best)<1e-12).map(r=>r.id); } const entry={ date:new Date().toISOString(), gameId:currentGame.id, gameTitle:currentGame.title, mode:cfg.type, scores:{...scores}, ftAttempts:selectedFtAttempts, percentageAttempts:{...percentageAttempts}, ranking, winnerId:null, winnerIds:[], horseState:JSON.parse(JSON.stringify(horseState)), liarState:JSON.parse(JSON.stringify(liarState)), liarLives:selectedLiarLives };
+function closeFtResolution(){ if(!ftResolution) return; ftResolution.classList.remove('active'); ftResolution.setAttribute('aria-hidden','true'); ftResolutionState=null; }
+function ftBaseOutcome(state){
+  const ids=currentOrder.map(p=>p.id);
+  const best=Math.max(...ids.map(id=>Number(state.baseScores[id]||0)));
+  const candidates=ids.filter(id=>Number(state.baseScores[id]||0)===best);
+  const ranking=ids.slice().sort((a,b)=>{
+    const scoreDiff=Number(state.baseScores[b]||0)-Number(state.baseScores[a]||0); if(scoreDiff) return scoreDiff;
+    return ids.indexOf(a)-ids.indexOf(b);
+  });
+  return {candidates,ranking};
+}
+function renderFtResolution(){
+  const state=ftResolutionState; if(!state) return;
+  const sixIds=currentOrder.map(p=>p.id).filter(id=>Number(state.baseScores[id]||0)>=6);
+  ftMainAttemptsList.innerHTML=sixIds.map(id=>{ const p=getPlayer(id), value=Number(state.baseAttempts[id]||state.maxAttempts); const opts=Array.from({length:state.maxAttempts-5},(_,i)=>i+6).map(n=>`<option value="${n}" ${n===value?'selected':''}>${n}</option>`).join(''); return `<div class="ft-main-attempt-row"><div class="ft-resolution-player">${(p?.name||id).toUpperCase()}</div><label>6 DE <select data-ft-main-attempts="${id}" aria-label="Intentos de ${p?.name||id}">${opts}</select></label></div>`; }).join('');
+  const outcome=ftBaseOutcome(state);
+  const tied=outcome.candidates.length>1;
+  state.tieIds=outcome.candidates;
+  if(!state.tieIds.includes(state.winnerId)) state.winnerId=null;
+  ftResolutionSub.textContent=sixIds.length?(tied?'Indica 6 de cuántos hizo cada jugador y completa el desempate.':'Indica en cuántos tiros llegó a 6.'): 'El resultado principal ha terminado empatado. Completa el desempate.';
+  ftTiebreakSection.classList.toggle('active',tied);
+  if(tied){
+    ftWinnerChoices.innerHTML=state.tieIds.map(id=>{ const p=getPlayer(id); return `<button class="ft-winner-choice ${state.winnerId===id?'selected':''}" type="button" data-ft-winner="${id}" style="--c1:${p?.c1||'#555'};--c2:${p?.c2||'#999'}">${(p?.name||id).toUpperCase()}</button>`; }).join('');
+    ftTiebreakRows.innerHTML=state.tieIds.map(id=>{ const p=getPlayer(id), tb=state.tiebreak[id]||{made:0,attempts:0}; return `<div class="ft-tiebreak-row"><div class="ft-tiebreak-player">${(p?.name||id).toUpperCase()}</div><div class="ft-tiebreak-fields"><label class="ft-tiebreak-field">METIÓ <input type="number" inputmode="numeric" min="0" step="1" value="${tb.made}" data-ft-tb-made="${id}"></label><label class="ft-tiebreak-field">DE <input type="number" inputmode="numeric" min="1" step="1" value="${tb.attempts||''}" data-ft-tb-attempts="${id}"></label></div></div>`; }).join('');
+  } else { ftWinnerChoices.innerHTML=''; ftTiebreakRows.innerHTML=''; }
+  ftResolutionError.textContent='';
+}
+function beginFtResolution(){
+  const maxAttempts=Number(selectedFtAttempts||10), baseScores={...scores}, baseAttempts={};
+  currentOrder.forEach(p=>baseAttempts[p.id]=maxAttempts);
+  ftResolutionState={maxAttempts,baseScores,baseAttempts,tieIds:[],winnerId:null,tiebreak:{}};
+  const outcome=ftBaseOutcome(ftResolutionState), sixIds=currentOrder.map(p=>p.id).filter(id=>Number(baseScores[id]||0)>=6);
+  if(!sixIds.length&&outcome.candidates.length===1){ finalizeFtResolution(outcome.candidates[0]); return; }
+  setTexture(ftResolutionConfirm); renderFtResolution(); ftResolution.classList.add('active'); ftResolution.setAttribute('aria-hidden','false');
+}
+function finalizeFtResolution(forcedWinnerId=null){
+  const state=ftResolutionState; if(!state) return;
+  const outcome=ftBaseOutcome(state), tied=outcome.candidates.length>1;
+  const winnerId=forcedWinnerId||(tied?state.winnerId:outcome.candidates[0]);
+  if(!winnerId){ ftResolutionError.textContent='Elige quién ganó el desempate.'; return; }
+  const finalScores={...state.baseScores}, attemptsByPlayer={...state.baseAttempts}, tiebreakPlayers={};
+  if(tied){
+    for(const id of outcome.candidates){ const tb=state.tiebreak[id]||{}; const made=Number(tb.made), attempts=Number(tb.attempts); if(!Number.isInteger(made)||made<0||!Number.isInteger(attempts)||attempts<1||made>attempts){ ftResolutionError.textContent='Revisa el desempate: los tiros deben ser enteros y los aciertos no pueden superar los intentos.'; return; } finalScores[id]=Number(finalScores[id]||0)+made; attemptsByPlayer[id]=Number(attemptsByPlayer[id]||0)+attempts; tiebreakPlayers[id]={made,attempts}; }
+  }
+  const ordered=[...outcome.ranking];
+  if(tied){ const restTied=outcome.candidates.filter(id=>id!==winnerId).sort((a,b)=>{ const aa=tiebreakPlayers[a]||{}, bb=tiebreakPlayers[b]||{}; const pa=aa.attempts?aa.made/aa.attempts:0, pb=bb.attempts?bb.made/bb.attempts:0; return pb-pa||bb.made-aa.made; }); const tiedSet=new Set(outcome.candidates); ordered.splice(0,ordered.length,winnerId,...restTied,...ordered.filter(id=>!tiedSet.has(id))); }
+  const ranking=ordered.map(id=>({id,metric:Number(attemptsByPlayer[id]||0)?Number(finalScores[id]||0)/Number(attemptsByPlayer[id]):0,score:Number(finalScores[id]||0)}));
+  const entry={ date:new Date().toISOString(), gameId:currentGame.id, gameTitle:currentGame.title, mode:'fixedPercent', scores:finalScores, ftAttempts:selectedFtAttempts, ftAttemptsByPlayer:attemptsByPlayer, ftBaseScores:{...state.baseScores}, ftBaseAttempts:{...state.baseAttempts}, ftTiebreak:tied?{winnerId,rounds:Math.max(...Object.values(tiebreakPlayers).map(x=>x.attempts)),players:tiebreakPlayers}:null, percentageAttempts:{}, ranking, winnerId:null, winnerIds:[] };
+  closeFtResolution(); persistResultEntry(entry,[winnerId]);
+}
+ftMainAttemptsList.addEventListener('change',e=>{ const select=e.target.closest('[data-ft-main-attempts]'); if(!select||!ftResolutionState)return; ftResolutionState.baseAttempts[select.dataset.ftMainAttempts]=Number(select.value); renderFtResolution(); });
+ftWinnerChoices.addEventListener('click',e=>{ const btn=e.target.closest('[data-ft-winner]'); if(!btn||!ftResolutionState)return; ftResolutionState.winnerId=btn.dataset.ftWinner; renderFtResolution(); });
+ftTiebreakRows.addEventListener('input',e=>{ if(!ftResolutionState)return; const made=e.target.closest('[data-ft-tb-made]'), attempts=e.target.closest('[data-ft-tb-attempts]'); const id=made?.dataset.ftTbMade||attempts?.dataset.ftTbAttempts; if(!id)return; const tb=ftResolutionState.tiebreak[id]||(ftResolutionState.tiebreak[id]={made:0,attempts:0}); if(made)tb.made=Number(made.value); if(attempts)tb.attempts=Number(attempts.value); ftResolutionError.textContent=''; });
+ftResolutionConfirm.addEventListener('click',()=>finalizeFtResolution());
+ftResolutionCancel.addEventListener('click',closeFtResolution);
+function registerResults(){ if(!currentGame||registerResultsBtn.disabled) return; const cfg=scoreConfigForGame(currentGame); if(cfg.type==='fixedPercent'){ beginFtResolution(); return; } const ranking=buildRanking(cfg); let candidateWinnerIds=[]; if(cfg.type==='horse'||cfg.type==='liar') candidateWinnerIds=ranking.length?[ranking[0].id]:[]; else { const best=ranking[0]?.metric ?? 0; candidateWinnerIds=ranking.filter(r=>Math.abs(r.metric-best)<1e-12).map(r=>r.id); } const entry={ date:new Date().toISOString(), gameId:currentGame.id, gameTitle:currentGame.title, mode:cfg.type, scores:{...scores}, ftAttempts:selectedFtAttempts, percentageAttempts:{...percentageAttempts}, ranking, winnerId:null, winnerIds:[], horseState:JSON.parse(JSON.stringify(horseState)), liarState:JSON.parse(JSON.stringify(liarState)), liarLives:selectedLiarLives };
   if(candidateWinnerIds.length>1){ openTieChooser(entry,candidateWinnerIds); return; }
   persistResultEntry(entry,candidateWinnerIds);
 }
 
 registerResultsBtn.addEventListener('click',registerResults);
-function scoreTextFor(entry,id){ const v=Number((entry.scores||{})[id]||0); if(entry.mode==='fixedPercent'){ const a=Number(entry.ftAttempts||0); return `${fmtPct(a?v/a*100:0)}`; } if(entry.mode==='variablePercent'){ const a=Number((entry.percentageAttempts||{})[id]||0); return `${fmtPct(a?v/a*100:0)}`; } if(entry.mode==='horse') return v>=5?'HORSE':'En juego'; if(entry.mode==='liar') return `${v} ${v===1?'vida':'vidas'}`; if(entry.mode==='territory') return `${v} ${v===1?'posta':'postas'}`; return `${v}`; }
+function scoreTextFor(entry,id){ const v=Number((entry.scores||{})[id]||0); if(entry.mode==='fixedPercent'){ const a=ftAttemptsForEntry(entry,id), tb=entry.ftTiebreak?.players?.[id]; const extra=tb?` · desempate ${tb.made}/${tb.attempts}`:''; return `${v}/${a} · ${fmtPct(a?v/a*100:0)}${extra}`; } if(entry.mode==='variablePercent'){ const a=Number((entry.percentageAttempts||{})[id]||0); return `${fmtPct(a?v/a*100:0)}`; } if(entry.mode==='horse') return v>=5?'HORSE':'En juego'; if(entry.mode==='liar') return `${v} ${v===1?'vida':'vidas'}`; if(entry.mode==='territory') return `${v} ${v===1?'posta':'postas'}`; return `${v}`; }
 function winnerDisplayScore(entry,id){ return scoreTextFor(entry,id); }
 function openGameHistory(gameId){ currentGame=getGame(gameId); if(!currentGame) return; setImg(historyGameBanner,GAME_BANNERS[currentGame.title],currentGame.title); renderGameHistory(gameId); activateView(gameHistoryView); }
 function renderGameHistory(gameId){ const entries=(getHistoryStore()[gameId]||[]); if(!entries.length){ gameHistoryList.innerHTML='<div class="history-empty">Todavía no hay resultados registrados para este juego.</div>'; return; } const allWins={}; entries.forEach(e=>(e.winnerIds||[e.winnerId]).forEach(id=>allWins[id]=(allWins[id]||0)+1)); gameHistoryList.innerHTML=[...entries].reverse().map(e=>{ const ws=e.winnerIds||[e.winnerId]; const first=getPlayer(ws[0]); const winnerName=ws.length>1?`EMPATE: ${ws.map(id=>getPlayer(id)?.name||id).join(' / ')}`:(first?.name||'—'); const winnerScore=ws.length===1?scoreTextFor(e,ws[0]):ws.map(id=>scoreTextFor(e,id)).join(' · '); const firstWins=ws.length===1?`${allWins[ws[0]]||0} 🏆`:ws.map(id=>`${allWins[id]||0} 🏆`).join(' · '); const second=e.ranking?.[1], third=e.ranking?.[2]; const dt=new Date(e.date).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}); return `<article class="history-entry"><div class="history-date">${dt}</div><div class="history-winner" style="--c1:${first?.c1||'#444'};--c2:${first?.c2||'#222'}"><span class="history-winner-name">${winnerName.toUpperCase()}</span><span class="history-win-count">${firstWins}</span></div><div class="history-winner-score">${winnerScore}</div><div class="history-places">${second?`<div>2.º <strong>${getPlayer(second.id)?.name||second.id}</strong> · <span class="history-score">${scoreTextFor(e,second.id)}</span></div>`:''}${third?`<div>3.º <strong>${getPlayer(third.id)?.name||third.id}</strong> · <span class="history-score">${scoreTextFor(e,third.id)}</span></div>`:''}</div></article>`; }).join(''); }
@@ -2635,7 +2744,7 @@ document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
 </script>
 
 
-<script id="bl-android-back-v242">
+<script id="bl-android-back-v25">
 (function(){
   const overlaySelector=[
     '.game-detail-view.active','.ft-config-view.active','.liar-config-view.active',
@@ -2645,6 +2754,11 @@ document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
     '.territory-view.active','.winner-view.active'
   ].join(',');
   window.blHandleAndroidBack=function(){
+    const ftModal=document.getElementById('ftResolution');
+    if(ftModal?.classList.contains('active')){
+      document.getElementById('ftResolutionCancel')?.click();
+      return true;
+    }
     const active=document.querySelector(overlaySelector);
     if(active){
       const back=active.querySelector('.overlay-back');
