@@ -4,8 +4,11 @@ on:
   push:
     branches: [main]
     paths:
-      - 'balcones-league/source.zip'
-      - 'balcones-league/asset-inputs/**'
+      - 'balcones-league/index.html'
+      - 'balcones-league/manifest.webmanifest'
+      - 'balcones-league/assets/**'
+      - 'balcones-league/android-app/**'
+      - 'balcones-league/download/index.html'
       - '.github/workflows/balcones-league-build.yml'
   workflow_dispatch:
 
@@ -19,309 +22,36 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Expand Balcones League source
+      - name: Validate Balcones League v2.5
         shell: bash
         run: |
           set -euo pipefail
-          test -f balcones-league/source.zip
-          rm -rf /tmp/blsrc
-          mkdir -p /tmp/blsrc
-          unzip -q -o balcones-league/source.zip -d /tmp/blsrc
-          rm -rf balcones-league/assets balcones-league/android-app
-          cp -R /tmp/blsrc/. balcones-league/
-
-      - name: Apply Balcones League v2.4.2 fixes
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          # High-quality game banners already supplied by Victor.
-          cp balcones-league/asset-inputs/21.svg balcones-league/assets/img_26.svg
-          cp balcones-league/asset-inputs/mentiroso.svg balcones-league/assets/img_27.svg
-          cp balcones-league/asset-inputs/tiros_libres.svg balcones-league/assets/img_28.svg
-          cp balcones-league/asset-inputs/territorio_triples.svg balcones-league/assets/img_29.svg
-          cp balcones-league/asset-inputs/el_reloj.svg balcones-league/assets/img_30.svg
-          cp balcones-league/asset-inputs/28.svg balcones-league/assets/img_31.svg
-          cp balcones-league/asset-inputs/triples.svg balcones-league/assets/img_32.svg
-          cp balcones-league/asset-inputs/porcentajes.svg balcones-league/assets/img_33.svg
-          cp balcones-league/asset-inputs/26.svg balcones-league/assets/img_34.svg
-          cp balcones-league/asset-inputs/horse.svg balcones-league/assets/img_35.svg
-
-          sed -i \
-            -e 's#assets/img_26.png#assets/img_26.svg#g' \
-            -e 's#assets/img_27.png#assets/img_27.svg#g' \
-            -e 's#assets/img_28.png#assets/img_28.svg#g' \
-            -e 's#assets/img_29.png#assets/img_29.svg#g' \
-            -e 's#assets/img_30.png#assets/img_30.svg#g' \
-            -e 's#assets/img_31.png#assets/img_31.svg#g' \
-            -e 's#assets/img_32.png#assets/img_32.svg#g' \
-            -e 's#assets/img_33.png#assets/img_33.svg#g' \
-            -e 's#assets/img_34.png#assets/img_34.svg#g' \
-            -e 's#assets/img_35.png#assets/img_35.svg#g' \
-            balcones-league/index.html
-
-          # Remove every obsolete/broken button asset and install the four real,
-          # cropped, high-resolution PNG files supplied by Victor.
-          rm -f \
-            balcones-league/assets/img_04.png \
-            balcones-league/assets/img_05.webp \
-            balcones-league/assets/img_36.webp \
-            balcones-league/assets/img_37.webp \
-            balcones-league/assets/img_38.webp \
-            balcones-league/assets/img_39.webp
-          for n in 1 2 3 4; do
-            cp "balcones-league/asset-inputs/action-button-${n}.png" \
-               "balcones-league/assets/action-button-${n}.png"
-          done
-
-          # New high-quality Territories court supplied for v2.4.
-          cat balcones-league/asset-inputs/territory-map.b64.part0* | base64 --decode > balcones-league/assets/img_40.webp
-
-          # Current app icon.
-          base64 --decode balcones-league/asset-inputs/app-icon.webp.b64 > /tmp/bl-app-icon.webp
-          python3 -m pip install --quiet pillow
-          python3 - <<'PY'
-          from pathlib import Path
-          from PIL import Image
-          import re
-
-          index = Path('balcones-league/index.html')
-          html = index.read_text(encoding='utf-8')
-
-          # Replace the old low-quality Territories image.
-          html = html.replace('assets/img_06.png', 'assets/img_40.webp')
-
-          # Keep game history black with white border/text.
-          history_override = '''
-          .game-history-btn{
-            margin-top:20px!important;
-            border:2px solid #fff!important;
-            background:#000!important;
-            background-image:none!important;
-            box-shadow:none!important;
-            color:#fff!important;
-          }
-          .game-history-btn span{color:#fff!important;}
-          '''
-
-          # All action buttons use the new files through one CSS custom property.
-          # New filenames avoid both stale WebView caches and the old broken assets.
-          button_override = '''
-          <style id="bl-action-buttons-v242">
-          .game-start-btn,
-          .fresh-action-btn,
-          .bl-textured-action{
-            --bl-button-texture:url("assets/action-button-1.png");
-            border:0!important;
-            overflow:hidden!important;
-            background-color:#000!important;
-            background-image:var(--bl-button-texture)!important;
-            background-size:100% 100%!important;
-            background-position:center!important;
-            background-repeat:no-repeat!important;
-            color:#fff!important;
-          }
-          .game-start-btn span,
-          .fresh-action-btn span,
-          .bl-textured-action span{
-            position:relative!important;
-            z-index:1!important;
-            color:#fff!important;
-            text-shadow:0 1px 5px rgba(0,0,0,.72)!important;
-          }
-          </style>
-          '''
-
-          # Remove the former blue/simple button references from the source HTML.
-          html = html.replace('assets/img_04.png', '')
-          html = html.replace('assets/img_05.webp', 'assets/action-button-1.png')
-          for old, new in zip(
-              ('assets/img_36.webp','assets/img_37.webp','assets/img_38.webp','assets/img_39.webp'),
-              ('assets/action-button-1.png','assets/action-button-2.png','assets/action-button-3.png','assets/action-button-4.png')
-          ):
-              html = html.replace(old, new)
-
-          if '</style>' not in html or '</head>' not in html:
-              raise SystemExit('style/head block not found')
-          html = html.replace('</style>', history_override + '\n</style>', 1)
-          html = html.replace('</head>', button_override + '\n</head>', 1)
-
-          textures = 'const BUTTON_TEXTURES = ["assets/action-button-1.png", "assets/action-button-2.png", "assets/action-button-3.png", "assets/action-button-4.png"];'
-          html, texture_count = re.subn(r'const BUTTON_TEXTURES\s*=\s*\[[^\]]*\];', textures, html, count=1)
-          if texture_count != 1:
-              raise SystemExit('BUTTON_TEXTURES declaration not found')
-
-          new_set = '''function setTexture(btn){
-            if(!btn) return;
-            const tex=randomTexture();
-            btn.classList.add('bl-textured-action');
-            btn.style.setProperty('--bl-button-texture',`url("${tex}")`);
-            btn.style.setProperty('background-image',`url("${tex}")`,'important');
-            btn.style.setProperty('background-size','100% 100%','important');
-            btn.style.setProperty('background-position','center','important');
-            btn.style.setProperty('background-repeat','no-repeat','important');
-            btn.dataset.blTexture=tex;
-          }'''
-          old_set = 'function setTexture(btn){ if(!btn || btn.classList.contains(\'fresh-action-btn\')) return; btn.style.backgroundImage=`url("${randomTexture()}")`; }'
-          if html.count(old_set) != 1:
-              raise SystemExit('exact setTexture function not found')
-          html = html.replace(old_set, new_set, 1)
-
-          # Preload all four textures before any flow opens.
-          preload_marker = 'function randomTexture(){'
-          if preload_marker not in html:
-              raise SystemExit('randomTexture function not found')
-          html = html.replace(preload_marker, "BUTTON_TEXTURES.forEach(src=>{const image=new Image();image.src=src;});\n" + preload_marker, 1)
-
-          if "if(id==='numero_aleatorio'){ setTexture(randGenerateBtn);" not in html:
-              raise SystemExit('random number texture hook missing')
-          if "setTexture(gameStartBtn);" not in html:
-              raise SystemExit('game start texture hook missing')
-          if "setTexture(drawNextBtn);" not in html:
-              marker = "drawNextBtn.addEventListener('click'"
-              if marker in html:
-                  html = html.replace(marker, "setTexture(drawNextBtn);\n" + marker, 1)
-              else:
-                  marker = "const drawNextBtn=document.getElementById('drawNextBtn');"
-                  if marker in html:
-                      html = html.replace(marker, marker + "\nsetTexture(drawNextBtn);", 1)
-
-          # Android hardware/gesture back: click the visible in-app back control.
-          # When no overlay is open, Search/Jugadores returns to Inicio; only then
-          # does the native Activity close the app.
-          android_back = '''
-          <script id="bl-android-back-v242">
-          (function(){
-            const overlaySelector=[
-              '.game-detail-view.active','.ft-config-view.active','.liar-config-view.active',
-              '.player-select-view.active','.draw-view.active','.scores-view.active',
-              '.game-history-view.active','.meta-view.active','.player-detail-view.active',
-              '.number-tool-view.active','.percent-tool-view.active','.roulette-view.active',
-              '.territory-view.active','.winner-view.active'
-            ].join(',');
-            window.blHandleAndroidBack=function(){
-              const active=document.querySelector(overlaySelector);
-              if(active){
-                const back=active.querySelector('.overlay-back');
-                if(back){back.click();return true;}
-                const home=active.querySelector('.overlay-home');
-                if(home){home.click();return true;}
-                const homeButton=document.getElementById('homeBtn');
-                if(homeButton){homeButton.click();return true;}
-              }
-              if(document.querySelector('#searchView.active,#playersHubView.active')){
-                const homeButton=document.getElementById('homeBtn');
-                if(homeButton){homeButton.click();return true;}
-              }
-              return false;
-            };
-          })();
-          </script>
-          '''
-          if '</body>' not in html:
-              raise SystemExit('body closing tag not found')
-          html = html.replace('</body>', android_back + '\n</body>', 1)
-
-          index.write_text(html, encoding='utf-8')
-
-          # Portrait-only at Android manifest and runtime level.
-          manifest = Path('balcones-league/android-app/app/src/main/AndroidManifest.xml')
-          xml = manifest.read_text(encoding='utf-8')
-          if 'android:screenOrientation=' in xml:
-              xml = re.sub(r'android:screenOrientation="[^"]*"', 'android:screenOrientation="portrait"', xml, count=1)
-          else:
-              xml = xml.replace('android:name=".MainActivity"', 'android:name=".MainActivity"\n            android:screenOrientation="portrait"', 1)
-          manifest.write_text(xml, encoding='utf-8')
-
-          java = Path('balcones-league/android-app/app/src/main/java/com/balconesleague/app/MainActivity.java')
-          srcjava = java.read_text(encoding='utf-8')
-          if 'import android.content.pm.ActivityInfo;' not in srcjava:
-              srcjava = srcjava.replace('import android.app.Activity;\n', 'import android.app.Activity;\nimport android.content.pm.ActivityInfo;\n', 1)
-          lock = 'setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);'
-          if lock not in srcjava:
-              srcjava = srcjava.replace('super.onCreate(savedInstanceState);', 'super.onCreate(savedInstanceState);\n        ' + lock, 1)
-
-          back_pattern = re.compile(
-              r'    @Override\s+public void onBackPressed\(\)\s*\{\s*'
-              r'if \(webView != null && webView\.canGoBack\(\)\) webView\.goBack\(\);\s*'
-              r'else super\.onBackPressed\(\);\s*\}'
-          )
-          new_back = (
-              '    private void fallbackBack() {\n'
-              '        if (webView != null && webView.canGoBack()) webView.goBack();\n'
-              '        else super.onBackPressed();\n'
-              '    }\n\n'
-              '    @Override\n'
-              '    public void onBackPressed() {\n'
-              '        if (webView == null) {\n'
-              '            fallbackBack();\n'
-              '            return;\n'
-              '        }\n'
-              '        webView.evaluateJavascript(\n'
-              '            "(function(){try{return !!(window.blHandleAndroidBack && window.blHandleAndroidBack());}catch(e){return false;}})()",\n'
-              '            handled -> {\n'
-              '                if (!"true".equals(handled)) fallbackBack();\n'
-              '            }\n'
-              '        );\n'
-              '    }'
-          )
-          srcjava, back_count = back_pattern.subn(new_back, srcjava, count=1)
-          if back_count != 1:
-              raise SystemExit('native onBackPressed method not found')
-          java.write_text(srcjava, encoding='utf-8')
-
-          # Recreate launcher/PWA icons.
-          src = Image.open('/tmp/bl-app-icon.webp').convert('RGBA')
-          src.resize((512,512), Image.Resampling.LANCZOS).save('balcones-league/assets/icon-512.webp', 'WEBP', quality=96, method=6)
-          src.resize((192,192), Image.Resampling.LANCZOS).save('balcones-league/assets/icon-192.webp', 'WEBP', quality=96, method=6)
-          sizes = {'mipmap-mdpi':48,'mipmap-hdpi':72,'mipmap-xhdpi':96,'mipmap-xxhdpi':144,'mipmap-xxxhdpi':192}
-          base = Path('balcones-league/android-app/app/src/main/res')
-          for folder, size in sizes.items():
-              out = base / folder / 'ic_launcher.png'
-              out.parent.mkdir(parents=True, exist_ok=True)
-              src.resize((size,size), Image.Resampling.LANCZOS).save(out, 'PNG', optimize=True)
-          PY
-
-          # Parse every inline script before compiling. This prevents a broken
-          # JavaScript bundle from ever reaching another APK/release.
           python3 - <<'PY'
           from pathlib import Path
           import re
-          html=Path('balcones-league/index.html').read_text(encoding='utf-8')
-          scripts=re.findall(r'<script(?:\s[^>]*)?>([\s\S]*?)</script>',html,flags=re.I)
+
+          html = Path('balcones-league/index.html').read_text(encoding='utf-8')
+          scripts = re.findall(r'<script(?:\s[^>]*)?>([\s\S]*?)</script>', html, flags=re.I)
           if not scripts:
               raise SystemExit('no inline scripts found')
-          for i,script in enumerate(scripts):
-              Path(f'/tmp/bl-inline-{i}.js').write_text(script,encoding='utf-8')
+          for i, script in enumerate(scripts):
+              Path(f'/tmp/bl-inline-{i}.js').write_text(script, encoding='utf-8')
           print(f'extracted {len(scripts)} inline scripts')
           PY
           for script in /tmp/bl-inline-*.js; do
             node --check "$script"
           done
 
-          sed -i "s/versionCode [0-9][0-9]*/versionCode 7/" balcones-league/android-app/app/build.gradle
-          sed -i "s/versionName '[^']*'/versionName '2.4.2'/" balcones-league/android-app/app/build.gradle
-
-          grep -q 'assets/img_40.webp' balcones-league/index.html
-          grep -q 'assets/action-button-1.png' balcones-league/index.html
-          ! grep -q 'assets/img_36.webp' balcones-league/index.html
-          ! grep -q 'assets/img_05.webp' balcones-league/index.html
-          grep -q 'background-image:none!important' balcones-league/index.html
+          grep -q "game.id==='28'.*max:28,target:28" balcones-league/index.html
+          grep -q "game.id==='triples'.*max:22,target:22" balcones-league/index.html
+          grep -q "game.id==='tiros_libres'.*max:6,target:6" balcones-league/index.html
+          grep -q 'ftAttemptsByPlayer' balcones-league/index.html
+          grep -q 'ftTiebreak' balcones-league/index.html
           grep -q 'blHandleAndroidBack' balcones-league/index.html
           grep -q 'android:screenOrientation="portrait"' balcones-league/android-app/app/src/main/AndroidManifest.xml
           grep -q 'SCREEN_ORIENTATION_PORTRAIT' balcones-league/android-app/app/src/main/java/com/balconesleague/app/MainActivity.java
-          grep -q 'evaluateJavascript' balcones-league/android-app/app/src/main/java/com/balconesleague/app/MainActivity.java
-          grep -q "versionName '2.4.2'" balcones-league/android-app/app/build.gradle
-
-          python3 - <<'PY'
-          from PIL import Image
-          from pathlib import Path
-          for n in range(1,5):
-              path=Path(f'balcones-league/assets/action-button-{n}.png')
-              with Image.open(path) as im:
-                  if im.format != 'PNG' or im.width < 1400 or im.height < 440:
-                      raise SystemExit(f'invalid button asset: {path} {im.format} {im.size}')
-          PY
+          grep -q "versionCode 8" balcones-league/android-app/app/build.gradle
+          grep -q "versionName '2.5'" balcones-league/android-app/app/build.gradle
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -355,7 +85,7 @@ jobs:
         run: |
           set -euo pipefail
           ASSETS='balcones-league/android-app/app/src/main/assets'
-          rm -rf "$ASSETS"
+          find "$ASSETS" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
           mkdir -p "$ASSETS/assets"
           cp balcones-league/index.html "$ASSETS/index.html"
           cp balcones-league/manifest.webmanifest "$ASSETS/manifest.webmanifest"
@@ -379,15 +109,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          TAG='balcones-league-v2.4.2'
+          TAG='balcones-league-v2.5'
           APK='balcones-league/android-app/app/build/outputs/apk/release/app-release.apk'
-          cp "$APK" /tmp/Balcones-League-v2.4.2.apk
+          cp "$APK" /tmp/Balcones-League-v2.5.apk
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" /tmp/Balcones-League-v2.4.2.apk --clobber
+            gh release upload "$TAG" /tmp/Balcones-League-v2.5.apk --clobber
           else
-            gh release create "$TAG" /tmp/Balcones-League-v2.4.2.apk \
-              --title 'Balcones League v2.4.2' \
-              --notes 'Corrige el bloqueo de la pantalla de introducción después de iniciar sesión. Mantiene los cuatro botones PNG en alta resolución y la navegación interna con Atrás de Android.'
+            gh release create "$TAG" /tmp/Balcones-League-v2.5.apk \
+              --title 'Balcones League v2.5' \
+              --notes '28 llega a 28 puntos; Triples llega a 22. Tiros libres llega a 6, registra 6 de cuántos y suma los tiros de desempate al resultado y las estadísticas.'
           fi
 
       - name: Publish direct APK
@@ -396,20 +126,12 @@ jobs:
           set -euo pipefail
           mkdir -p balcones-league/download
           cp balcones-league/android-app/app/build/outputs/apk/release/app-release.apk balcones-league/download/Balcones-League.apk
-          cp balcones-league/android-app/app/build/outputs/apk/release/app-release.apk balcones-league/download/Balcones-League-v2.4.2.apk
-
-          if [ -f balcones-league/download/index.html ]; then
-            sed -i \
-              -e 's/v2\.4\.1 ·/v2.4.2 ·/g' \
-              -e 's#/balcones-league-v2\.4\.1/#/balcones-league-v2.4.2/#g' \
-              -e 's/Balcones-League-v2\.4\.1\.apk/Balcones-League-v2.4.2.apk/g' \
-              balcones-league/download/index.html
-          fi
+          cp balcones-league/android-app/app/build/outputs/apk/release/app-release.apk balcones-league/download/Balcones-League-v2.5.apk
 
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add balcones-league
           if ! git diff --cached --quiet; then
-            git commit -m 'Balcones League v2.4.2 Android + APK [skip ci]'
+            git commit -m 'Balcones League v2.5 Android + APK [skip ci]'
             git push
           fi
