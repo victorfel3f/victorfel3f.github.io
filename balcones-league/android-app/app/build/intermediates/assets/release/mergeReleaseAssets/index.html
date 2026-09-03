@@ -760,10 +760,10 @@ body {
 .player-hub-stat{border-radius:14px;background:rgba(255,255,255,.04);padding:9px 8px;text-align:center}
 .player-hub-stat b{display:block;font-size:18px;line-height:1.1}
 .player-hub-stat span{display:block;margin-top:2px;font-size:10px;letter-spacing:.08em;color:#bfc2cd}
-.player-detail-view,.meta-view,.number-tool-view,.percent-tool-view,.roulette-view{position:absolute;inset:0;z-index:95;display:none;background:#000;color:#fff}
-.player-detail-view.active,.meta-view.active,.number-tool-view.active,.percent-tool-view.active,.roulette-view.active{display:block}
+.player-detail-view,.meta-view,.number-tool-view,.percent-tool-view,.roulette-view,.stopwatch-view{position:absolute;inset:0;z-index:95;display:none;background:#000;color:#fff}
+.player-detail-view.active,.meta-view.active,.number-tool-view.active,.percent-tool-view.active,.roulette-view.active,.stopwatch-view.active{display:block}
 .territory-screen{overflow-x:hidden!important;padding-left:12px!important;padding-right:12px!important;box-sizing:border-box}
-.top-ribbon-fx::before,.game-detail-view::before,.ft-config-view::before,.liar-config-view::before,.player-select-view::before,.draw-view::before,.scores-view::before,.game-history-view::before,.player-detail-view::before,.meta-view::before,.number-tool-view::before,.percent-tool-view::before,.roulette-view::before{content:"";position:absolute;left:0;right:0;top:0;height:54px;background:#000;z-index:99}
+.top-ribbon-fx::before,.game-detail-view::before,.ft-config-view::before,.liar-config-view::before,.player-select-view::before,.draw-view::before,.scores-view::before,.game-history-view::before,.player-detail-view::before,.meta-view::before,.number-tool-view::before,.percent-tool-view::before,.roulette-view::before,.stopwatch-view::before{content:"";position:absolute;left:0;right:0;top:0;height:54px;background:#000;z-index:99}
 .overlay-back,.overlay-home{top:calc(9px + env(safe-area-inset-top))!important;width:31px!important;height:31px!important;font-size:18px!important;left:12px!important}
 .overlay-home{left:48px!important;font-size:16px!important}
 .overlay-scroll,.draw-content{padding-top:58px!important;box-sizing:border-box}
@@ -819,7 +819,7 @@ body {
 .recent-item-top{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:#c6cada;margin-bottom:3px}
 .recent-item-main{font-size:15px;font-weight:850}
 .recent-item-sub{font-size:12px;color:#a8aebf}
-.number-tool-content,.percent-tool-content,.roulette-content{padding:0 16px 110px}
+.number-tool-content,.percent-tool-content,.roulette-content,.stopwatch-tool-content{padding:0 16px 110px}
 .tool-title{font-size:42px;line-height:1.02;text-align:center;font-weight:950;letter-spacing:-.03em;margin:2px 0 8px}
 .tool-sub{font-size:12px;color:#bcc0ce;text-align:center;margin:0 auto 14px;max-width:340px;line-height:1.35}
 .tool-card{border-radius:22px;border:1px solid rgba(255,255,255,.09);background:#101116;padding:15px 14px;margin-bottom:13px}
@@ -1155,6 +1155,39 @@ body {
 }
 .bl-manual-sync-btn:active{opacity:1}
 .bl-manual-sync-btn:disabled{opacity:.35}
+
+/* ==== v2.6 · Cronómetro y dinámicas de Mentiroso ==== */
+.liar-dynamics{width:100%;max-width:380px;margin:22px auto 0}
+.liar-dynamics-title{text-align:center;color:#c9cbd4;font-size:11px;font-weight:900;letter-spacing:.17em;margin-bottom:9px}
+.liar-mode-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.liar-mode-option{min-height:88px;padding:12px 9px;border-radius:19px;border:2px solid #505159;background:linear-gradient(#292a30,#15161b);color:#8f929d;text-align:center}
+.liar-mode-option strong{display:block;font-size:14px;font-weight:950;letter-spacing:.02em}
+.liar-mode-option span{display:block;margin-top:5px;font-size:10px;line-height:1.25}
+.liar-mode-option.selected{border-color:#fff;color:#fff;background:linear-gradient(125deg,#5e25dc,#d62a83 62%,#2e9fc8);box-shadow:0 0 24px rgba(132,54,231,.25)}
+.liar-config-view .ft-options{margin-top:27px}
+.liar-config-view .medium-btn{margin-top:20px}
+.liar-mode-note{font-size:10px;color:#b7bbc7;text-align:center;letter-spacing:.08em;margin:-1px 0 7px}
+.special-status.completed{color:#7ef3c8}
+
+.stopwatch-tool-content{max-width:460px;margin:0 auto;text-align:center}
+.stopwatch-card{position:relative;overflow:hidden;border-radius:26px;border:1px solid rgba(255,255,255,.13);background:#101116;padding:22px 14px 17px;box-shadow:0 18px 48px rgba(0,0,0,.42)}
+.stopwatch-card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 18% 8%,rgba(210,46,255,.31),transparent 35%),radial-gradient(circle at 86% 74%,rgba(46,197,255,.24),transparent 38%);pointer-events:none}
+.stopwatch-card>*{position:relative}
+.stopwatch-status{font-size:10px;font-weight:900;letter-spacing:.20em;color:#aeb2c0}
+.stopwatch-status.running{color:#74e7ff}
+.stopwatch-display{margin:13px 0 20px;font-variant-numeric:tabular-nums;font-size:clamp(43px,12.4vw,62px);font-weight:950;line-height:1;letter-spacing:-.055em;text-shadow:0 0 30px rgba(157,63,255,.30);white-space:nowrap}
+.stopwatch-primary{width:100%!important;max-width:330px!important;margin:0 auto!important}
+.stopwatch-secondary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;max-width:330px;margin:10px auto 0}
+.stopwatch-secondary .outline-btn{width:100%;height:49px;border-radius:16px;font-size:12px}
+.stopwatch-secondary button:disabled{opacity:.28;filter:grayscale(1)}
+.stopwatch-laps-wrap{margin-top:14px;text-align:left}
+.stopwatch-laps-head{display:flex;justify-content:space-between;padding:0 3px 7px;color:#aeb3c0;font-size:10px;font-weight:850;letter-spacing:.10em}
+.stopwatch-laps{display:grid;gap:7px;max-height:290px;overflow-y:auto;overscroll-behavior:contain}
+.stopwatch-lap{display:grid;grid-template-columns:58px 1fr 1fr;gap:7px;align-items:center;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#12131a;padding:10px 11px;font-variant-numeric:tabular-nums}
+.stopwatch-lap strong{font-size:12px}
+.stopwatch-lap span{font-size:13px;font-weight:850;text-align:right}
+.stopwatch-lap .lap-total{color:#aeb4c2}
+.stopwatch-empty{text-align:center;border-radius:14px;border:1px dashed rgba(255,255,255,.10);padding:14px 10px;color:#777b88;font-size:11px}
 @media (orientation:landscape){
   #blCloudGate{padding-left:calc((100vw - (100dvh * 9 / 16))/2 + 24px);padding-right:calc((100vw - (100dvh * 9 / 16))/2 + 24px)}
 }
@@ -1293,6 +1326,13 @@ body {
         <button type="button" data-lives="3">3</button>
         <button type="button" data-lives="5">5</button>
         <button type="button" data-lives="6">6</button>
+      </div>
+      <div class="liar-dynamics">
+        <div class="liar-dynamics-title">DINÁMICA</div>
+        <div class="liar-mode-options" id="liarModeOptions">
+          <button class="liar-mode-option selected" type="button" data-liar-mode="subtract"><strong>RESTAR VIDAS</strong><span>Empiezan activas. Gana el último con corazones.</span></button>
+          <button class="liar-mode-option" type="button" data-liar-mode="add"><strong>SUMAR VIDAS</strong><span>Empiezan apagadas. Gana el primero que activa todas.</span></button>
+        </div>
       </div>
       <button class="balcones-btn medium-btn" id="liarContinueBtn" type="button" disabled><span>CONTINUAR</span></button>
     </div>
@@ -1447,6 +1487,31 @@ body {
     </div>
   </section>
 
+  <section class="stopwatch-view" id="stopwatchView" aria-hidden="true">
+    <button class="overlay-back" id="stopwatchBack" type="button" aria-label="Volver">‹</button>
+    <button class="overlay-home" type="button" aria-label="Inicio">⌂</button>
+    <div class="overlay-scroll history-screen">
+      <div class="stopwatch-tool-content">
+        <div class="flow-header-art tool tool-top-logo" aria-hidden="true"></div>
+        <h1 class="tool-title">CRONÓMETRO</h1>
+        <p class="tool-sub">Mide el tiempo y guarda vueltas con su parcial y total.</p>
+        <div class="stopwatch-card">
+          <div class="stopwatch-status" id="stopwatchStatus">LISTO</div>
+          <div class="stopwatch-display" id="stopwatchDisplay" aria-live="off">00:00.00</div>
+          <button class="fresh-action-btn stopwatch-primary" id="stopwatchStartBtn" type="button"><span>INICIAR</span></button>
+          <div class="stopwatch-secondary">
+            <button class="outline-btn" id="stopwatchLapBtn" type="button" disabled>VUELTA</button>
+            <button class="outline-btn" id="stopwatchResetBtn" type="button" disabled>REINICIAR</button>
+          </div>
+        </div>
+        <div class="stopwatch-laps-wrap">
+          <div class="stopwatch-laps-head"><span>VUELTAS</span><span>PARCIAL · TOTAL</span></div>
+          <div class="stopwatch-laps" id="stopwatchLaps"><div class="stopwatch-empty">Todavía no hay vueltas.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="territory-view" id="territoryView" aria-hidden="true">
     <button class="overlay-back" id="territoryBack" type="button" aria-label="Volver">‹</button>
     <button class="overlay-home" type="button" aria-label="Inicio">⌂</button>
@@ -1524,7 +1589,7 @@ body {
 
 <script>
 const games = [{"id": "21", "title": "21", "covers": ["assets/img_09.webp"]}, {"id": "26", "title": "26", "covers": ["assets/img_10.webp"]}, {"id": "28", "title": "28", "covers": ["assets/img_11.webp"]}, {"id": "triples", "title": "Triples", "covers": ["assets/img_12.webp"]}, {"id": "territorio_triples", "title": "Territorio Triples", "covers": ["assets/img_13.webp"]}, {"id": "mentiroso", "title": "Mentiroso", "covers": ["assets/img_14.webp"]}, {"id": "tiros_libres", "title": "Tiros Libres", "covers": ["assets/img_15.webp"]}, {"id": "porcentajes", "title": "Porcentajes", "covers": ["assets/img_16.webp"]}, {"id": "horse", "title": "Horse", "covers": ["assets/img_17.webp"]}, {"id": "el_reloj", "title": "El Reloj", "covers": ["assets/img_18.webp"]}];
-const tools = [{"id": "calcular_porcentajes", "title": "Calcular Porcentajes", "cover": "assets/img_19.webp"}, {"id": "numero_aleatorio", "title": "Número Aleatorio", "cover": "assets/img_20.webp"}, {"id": "orden_aleatorio", "title": "Orden Aleatorio", "cover": "assets/img_21.webp"}, {"id": "ruleta_juegos", "title": "Ruleta de Juegos", "cover": "assets/img_22.webp"}];
+const tools = [{"id": "calcular_porcentajes", "title": "Calcular Porcentajes", "cover": "assets/img_19.webp"}, {"id": "numero_aleatorio", "title": "Número Aleatorio", "cover": "assets/img_20.webp"}, {"id": "orden_aleatorio", "title": "Orden Aleatorio", "cover": "assets/img_21.webp"}, {"id": "ruleta_juegos", "title": "Ruleta de Juegos", "cover": "assets/img_22.webp"}, {"id": "cronometro", "title": "Cronómetro", "cover": "assets/img_41.jpg"}];
 const historyItems = [{"id": "palmares", "title": "Palmarés", "cover": "assets/img_23.webp"}, {"id": "historial", "title": "Historial", "cover": "assets/img_24.webp"}, {"id": "ranking", "title": "Ranking", "cover": "assets/img_25.jpg"}];
 const GAME_BANNERS = {"21": "assets/img_26.svg", "Mentiroso": "assets/img_27.svg", "Tiros Libres": "assets/img_28.svg", "Territorio Triples": "assets/img_29.svg", "El Reloj": "assets/img_30.svg", "28": "assets/img_31.svg", "Triples": "assets/img_32.svg", "Porcentajes": "assets/img_33.svg", "26": "assets/img_34.svg", "Horse": "assets/img_35.svg"};
 const BUTTON_TEXTURES = ["assets/action-button-1.png", "assets/action-button-2.png", "assets/action-button-3.png", "assets/action-button-4.png"];
@@ -1569,6 +1634,7 @@ const liarConfigView=document.getElementById('liarConfigView');
 const liarConfigBack=document.getElementById('liarConfigBack');
 const liarConfigBanner=document.getElementById('liarConfigBanner');
 const liarOptions=document.getElementById('liarOptions');
+const liarModeOptions=document.getElementById('liarModeOptions');
 const liarContinueBtn=document.getElementById('liarContinueBtn');
 
 const playerSelectView=document.getElementById('playerSelectView');
@@ -1637,6 +1703,14 @@ const rouletteResult=document.getElementById('rouletteResult');
 const rouletteResultName=document.getElementById('rouletteResultName');
 const roulettePlayBtn=document.getElementById('roulettePlayBtn');
 const rouletteOtherBtn=document.getElementById('rouletteOtherBtn');
+const stopwatchView=document.getElementById('stopwatchView');
+const stopwatchBack=document.getElementById('stopwatchBack');
+const stopwatchStatus=document.getElementById('stopwatchStatus');
+const stopwatchDisplay=document.getElementById('stopwatchDisplay');
+const stopwatchStartBtn=document.getElementById('stopwatchStartBtn');
+const stopwatchLapBtn=document.getElementById('stopwatchLapBtn');
+const stopwatchResetBtn=document.getElementById('stopwatchResetBtn');
+const stopwatchLaps=document.getElementById('stopwatchLaps');
 const territoryView=document.getElementById('territoryView');
 const territoryBack=document.getElementById('territoryBack');
 const territoryBanner=document.getElementById('territoryBanner');
@@ -1678,13 +1752,15 @@ let maxPlayers=PLAYERS.length;
 let selectedIds=new Set();
 let selectedFtAttempts=null;
 let selectedLiarLives=null;
+let selectedLiarMode='subtract';
 let currentOrder=[];
 let percentageAttempts={};
 let scores={};
 let manuallyFinished=false;
 let drawInterval=null, drawTimer=null;
-let horseState={}, liarState={}, eliminationOrder=[];
+let horseState={}, liarState={}, eliminationOrder=[], liarCompletionOrder=[];
 let rouletteSpinning=false, rouletteChosenId=null, slotOffset=0;
+let stopwatchRunning=false, stopwatchStartedAt=0, stopwatchAccumulatedMs=0, stopwatchFrame=null, stopwatchLapTotals=[];
 const rouletteGames=games.slice();
 let territorySetup={startPost:null,playerPosts:{}};
 let territoryOwners={};
@@ -1733,7 +1809,7 @@ function fmtPct(value){ if(!isFinite(value)) return '0%'; return `${value.toFixe
 function clamp(n,min,max){ return Math.max(min,Math.min(max,n)); }
 function resetViewScroll(view){ pageEl.scrollTop=0; window.scrollTo(0,0); const s=view?.querySelector('.overlay-scroll,.draw-content'); if(s) s.scrollTop=0; if(view) view.scrollTop=0; requestAnimationFrame(()=>{ pageEl.scrollTop=0; window.scrollTo(0,0); if(s) s.scrollTop=0; if(view) view.scrollTop=0;}); }
 function clearDrawTimers(){ if(drawInterval){ clearInterval(drawInterval); drawInterval=null; } if(drawTimer){ clearTimeout(drawTimer); drawTimer=null; } }
-function hideAllOverlays(except=null){ [gameDetailView,ftConfigView,liarConfigView,playerSelectView,drawView,scoresView,gameHistoryView,metaView,playerDetailView,numberToolView,percentToolView,rouletteView,territoryView,winnerView].forEach(v=>{ if(v!==except){ v.classList.remove('active'); v.setAttribute('aria-hidden','true'); } }); }
+function hideAllOverlays(except=null){ [gameDetailView,ftConfigView,liarConfigView,playerSelectView,drawView,scoresView,gameHistoryView,metaView,playerDetailView,numberToolView,percentToolView,rouletteView,stopwatchView,territoryView,winnerView].forEach(v=>{ if(v!==except){ v.classList.remove('active'); v.setAttribute('aria-hidden','true'); } }); }
 function activateView(view){ hideAllOverlays(view); view.classList.add('active'); view.setAttribute('aria-hidden','false'); resetViewScroll(view); }
 function updateBottomNav(active){ [homeBtn,searchBtn,playersBtn].forEach(b=>b.classList.remove('active')); if(active==='home') homeBtn.classList.add('active'); if(active==='search') searchBtn.classList.add('active'); if(active==='players') playersBtn.classList.add('active'); }
 function showHome(){ hideAllOverlays(); catalogEl.classList.remove('hidden'); searchView.classList.remove('active'); playersHubView.classList.remove('active'); updateBottomNav('home'); pageEl.scrollTop=0; }
@@ -1762,6 +1838,7 @@ function routeItem(id){
     if(id==='numero_aleatorio'){ setTexture(randGenerateBtn); activateView(numberToolView); return; }
     if(id==='calcular_porcentajes'){ activateView(percentToolView); updatePercentTool(); return; }
     if(id==='ruleta_juegos'){ openRoulette(); return; }
+    if(id==='cronometro'){ openStopwatch(); return; }
   }
   if(catalogItem?.kind==='history'){ openMeta(id); }
 }
@@ -1826,9 +1903,10 @@ function openFtConfig(){ selectedFtAttempts=null; [...ftOptions.querySelectorAll
 ftConfigBack.addEventListener('click',()=>openGameDetail(currentGame.id));
 ftOptions.addEventListener('click',e=>{ const b=e.target.closest('[data-ft]'); if(!b) return; selectedFtAttempts=Number(b.dataset.ft); [...ftOptions.querySelectorAll('button')].forEach(x=>x.classList.toggle('selected',x===b)); ftContinueBtn.disabled=false; });
 ftContinueBtn.addEventListener('click',()=>openPlayerSelector('game'));
-function openLiarConfig(){ selectedLiarLives=null; [...liarOptions.querySelectorAll('button')].forEach(b=>b.classList.remove('selected')); liarContinueBtn.disabled=true; setTexture(liarContinueBtn); setImg(liarConfigBanner,GAME_BANNERS[currentGame.title],currentGame.title); activateView(liarConfigView); }
+function openLiarConfig(){ selectedLiarLives=null; selectedLiarMode='subtract'; [...liarOptions.querySelectorAll('button')].forEach(b=>b.classList.remove('selected')); [...liarModeOptions.querySelectorAll('[data-liar-mode]')].forEach(b=>b.classList.toggle('selected',b.dataset.liarMode===selectedLiarMode)); liarContinueBtn.disabled=true; setTexture(liarContinueBtn); setImg(liarConfigBanner,GAME_BANNERS[currentGame.title],currentGame.title); activateView(liarConfigView); }
 liarConfigBack.addEventListener('click',()=>openGameDetail(currentGame.id));
 liarOptions.addEventListener('click',e=>{ const b=e.target.closest('[data-lives]'); if(!b) return; selectedLiarLives=Number(b.dataset.lives); [...liarOptions.querySelectorAll('button')].forEach(x=>x.classList.toggle('selected',x===b)); liarContinueBtn.disabled=false; });
+liarModeOptions.addEventListener('click',e=>{ const b=e.target.closest('[data-liar-mode]'); if(!b) return; selectedLiarMode=b.dataset.liarMode; [...liarModeOptions.querySelectorAll('[data-liar-mode]')].forEach(x=>x.classList.toggle('selected',x===b)); });
 liarContinueBtn.addEventListener('click',()=>openPlayerSelector('game'));
 function setHeaderArt(el,mode){ el.innerHTML=''; el.classList.remove('game','tool'); if(mode==='game'&&currentGame){ el.classList.add('game'); const img=document.createElement('img'); img.src=GAME_BANNERS[currentGame.title]; img.alt=currentGame.title; el.appendChild(img); } else el.classList.add('tool'); }
 function renderPlayersSelection(){ playersList.innerHTML=''; PLAYERS.forEach(p=>{ const b=document.createElement('button'); b.type='button'; b.className='player-option'; b.dataset.playerId=p.id; b.style.setProperty('--c1',p.c1); b.style.setProperty('--c2',p.c2); b.innerHTML=`<span class="player-name">${p.name.toUpperCase()}</span><span class="player-check">✓</span>`; playersList.appendChild(b); }); updateSelection(); }
@@ -1846,7 +1924,7 @@ function openPlayerSelector(mode){
   flowMode=mode;
   minPlayers=mode==='orderTool'?2:3;
   maxPlayers=(mode==='game'&&currentGame?.id==='territorio_triples')?5:PLAYERS.length;
-  selectedIds=new Set(); currentOrder=[]; percentageAttempts={}; scores={}; horseState={}; liarState={}; eliminationOrder=[]; manuallyFinished=false;
+  selectedIds=new Set(); currentOrder=[]; percentageAttempts={}; scores={}; horseState={}; liarState={}; eliminationOrder=[]; liarCompletionOrder=[]; manuallyFinished=false;
   territorySetup={startPost:null,playerPosts:{}}; territoryOwners={}; territoryActivePost=null;
   setHeaderArt(selectorHeaderArt,mode);
   selectorTitle.innerHTML='ELEGIR<br>JUGADORES';
@@ -2046,8 +2124,8 @@ function scorePickerHtml(p,max,value=0){ return `<div class="score-picker" style
 function updateScoreWindow(id,value,max){ const prev=scoresList.querySelector(`[data-prev="${id}"]`), cur=scoresList.querySelector(`[data-current="${id}"]`), next=scoresList.querySelector(`[data-next="${id}"]`); if(prev){ prev.textContent=value>0?value-1:''; prev.classList.toggle('edge-empty',value<=0); } if(cur) cur.textContent=value; if(next){ next.textContent=value<max?value+1:''; next.classList.toggle('edge-empty',value>=max); } }
 function standardScoreCard(p,cfg){ let max=cfg.max; if(cfg.type==='variablePercent') max=percentageAttempts[p.id]; scores[p.id]=0; let topNote=''; if(cfg.type==='fixedPercent') topNote=`<div class="attempts-note">OBJETIVO <strong>6</strong> · MÁXIMO ${selectedFtAttempts} TIROS</div>`; if(cfg.type==='variablePercent') topNote=`<div class="percent-shot-inline">TIROS LIBRES <strong>${max}</strong></div>`; return `<div class="score-card" data-player="${p.id}" style="--c1:${p.c1};--c2:${p.c2}"><div class="score-player">${p.name.toUpperCase()}</div>${topNote}${scorePickerHtml(p,max,0)}<div class="score-meta" data-score-readout="${p.id}">${cfg.type==='score'?'':scoreDisplay(p.id,0,cfg)}</div></div>`; }
 function horseCard(p){ horseState[p.id]=[false,false,false,false,false]; scores[p.id]=0; const letters=['H','O','R','S','E']; return `<div class="score-card special-card" data-player="${p.id}" style="--c1:${p.c1};--c2:${p.c2}"><div class="score-player">${p.name.toUpperCase()}</div><div class="horse-letters">${letters.map((l,i)=>`<button class="horse-letter" type="button" data-horse-player="${p.id}" data-horse-index="${i}">${l}</button>`).join('')}</div><div class="special-status" data-special-status="${p.id}">0 / 5 letras</div></div>`; }
-function liarCard(p){ liarState[p.id]=Array(selectedLiarLives).fill(true); scores[p.id]=selectedLiarLives; return `<div class="score-card special-card" data-player="${p.id}" style="--c1:${p.c1};--c2:${p.c2}"><div class="score-player">${p.name.toUpperCase()}</div><div class="life-hearts">${Array.from({length:selectedLiarLives},(_,i)=>`<button class="life-heart" type="button" data-life-player="${p.id}" data-life-index="${i}" aria-label="Vida ${i+1}">♥</button>`).join('')}</div><div class="special-status" data-special-status="${p.id}">${selectedLiarLives} vidas</div></div>`; }
-function openScores(){ if(!currentGame) return; manuallyFinished=false; scores={}; horseState={}; liarState={}; eliminationOrder=[]; finishGameBtn.classList.remove('finished'); finishGameBtn.textContent='FINALIZAR JUEGO'; setTexture(registerResultsBtn); registerResultsBtn.disabled=true; setImg(scoresGameBanner,GAME_BANNERS[currentGame.title],currentGame.title); const cfg=scoreConfigForGame(currentGame); if(cfg.type==='horse'){ scoresList.innerHTML=currentOrder.map(horseCard).join(''); finishGameBtn.style.display='none'; registerHint.textContent='Completa HORSE para eliminar jugadores. Podrás registrar cuando quede uno.'; } else if(cfg.type==='liar'){ scoresList.innerHTML=currentOrder.map(liarCard).join(''); finishGameBtn.style.display='none'; registerHint.textContent='Pulsa corazones para perder vidas. Podrás registrar cuando quede uno.'; } else { scoresList.innerHTML=currentOrder.map(p=>standardScoreCard(p,cfg)).join(''); finishGameBtn.style.display=''; if(cfg.type==='variablePercent') registerHint.textContent='Cada jugador tiene sus tiros sorteados. Introduce aciertos y finaliza el juego.'; else if(cfg.type==='fixedPercent') registerHint.textContent='Introduce los aciertos y finaliza el juego.'; }
+function liarCard(p){ const adding=selectedLiarMode==='add'; liarState[p.id]=Array(selectedLiarLives).fill(!adding); scores[p.id]=adding?0:selectedLiarLives; const modeNote=adding?'SUMAR VIDAS':'RESTAR VIDAS'; const status=adding?`0 / ${selectedLiarLives} corazones`:`${selectedLiarLives} vidas`; return `<div class="score-card special-card" data-player="${p.id}" style="--c1:${p.c1};--c2:${p.c2}"><div class="score-player">${p.name.toUpperCase()}</div><div class="liar-mode-note">${modeNote}</div><div class="life-hearts">${Array.from({length:selectedLiarLives},(_,i)=>`<button class="life-heart ${adding?'lost':''}" type="button" data-life-player="${p.id}" data-life-index="${i}" aria-label="Corazón ${i+1}">♥</button>`).join('')}</div><div class="special-status" data-special-status="${p.id}">${status}</div></div>`; }
+function openScores(){ if(!currentGame) return; manuallyFinished=false; scores={}; horseState={}; liarState={}; eliminationOrder=[]; liarCompletionOrder=[]; finishGameBtn.classList.remove('finished'); finishGameBtn.textContent='FINALIZAR JUEGO'; setTexture(registerResultsBtn); registerResultsBtn.disabled=true; setImg(scoresGameBanner,GAME_BANNERS[currentGame.title],currentGame.title); const cfg=scoreConfigForGame(currentGame); if(cfg.type==='horse'){ scoresList.innerHTML=currentOrder.map(horseCard).join(''); finishGameBtn.style.display='none'; registerHint.textContent='Completa HORSE para eliminar jugadores. Podrás registrar cuando quede uno.'; } else if(cfg.type==='liar'){ scoresList.innerHTML=currentOrder.map(liarCard).join(''); finishGameBtn.style.display='none'; registerHint.textContent=selectedLiarMode==='add'?'Activa corazones. Gana el primero que complete todos.':'Pulsa corazones para perder vidas. Podrás registrar cuando quede uno.'; } else { scoresList.innerHTML=currentOrder.map(p=>standardScoreCard(p,cfg)).join(''); finishGameBtn.style.display=''; if(cfg.type==='variablePercent') registerHint.textContent='Cada jugador tiene sus tiros sorteados. Introduce aciertos y finaliza el juego.'; else if(cfg.type==='fixedPercent') registerHint.textContent='Introduce los aciertos y finaliza el juego.'; }
   updateRegisterAvailability(); activateView(scoresView); }
 function setScoreFromWindow(win,value){
   const id=win.dataset.scoreWindow, max=Number(win.dataset.max||0); value=clamp(Math.round(value),0,max); win.dataset.value=String(value); scores[id]=value; updateScoreWindow(id,value,max); const native=win.parentElement.querySelector(`[data-score-slider="${id}"]`); if(native && Number(native.value)!==value) native.value=String(value); const cfg=scoreConfigForGame(currentGame), read=scoresList.querySelector(`[data-score-readout="${id}"]`); if(read) read.textContent=cfg.type==='score'?'':scoreDisplay(id,value,cfg); updateRegisterAvailability();
@@ -2068,13 +2146,13 @@ if(!window.PointerEvent){
 }
 scoresList.addEventListener('click',e=>{ const win=e.target.closest('[data-score-window]'); if(!win) return; const rect=win.getBoundingClientRect(); const x=e.clientX-rect.left; const current=Number(win.dataset.value||0); if(x<rect.width*.28) setScoreFromWindow(win,current-1); else if(x>rect.width*.72) setScoreFromWindow(win,current+1); });
 scoresList.addEventListener('click', e=>{ const hb=e.target.closest('[data-horse-player]'); if(hb){ const id=hb.dataset.horsePlayer, idx=Number(hb.dataset.horseIndex); const state=horseState[id]; state[idx]=!state[idx]; hb.classList.toggle('lost',state[idx]); const count=state.filter(Boolean).length; scores[id]=count; const status=scoresList.querySelector(`[data-special-status="${id}"]`); if(status){ status.textContent=count===5?'ELIMINADO':`${count} / 5 letras`; status.classList.toggle('eliminated',count===5); } if(count===5&&!eliminationOrder.includes(id)) eliminationOrder.push(id); if(count<5) eliminationOrder=eliminationOrder.filter(x=>x!==id); updateRegisterAvailability(); return; }
-  const lb=e.target.closest('[data-life-player]'); if(lb){ const id=lb.dataset.lifePlayer, idx=Number(lb.dataset.lifeIndex); const state=liarState[id]; state[idx]=!state[idx]; lb.classList.toggle('lost',!state[idx]); const count=state.filter(Boolean).length; scores[id]=count; const status=scoresList.querySelector(`[data-special-status="${id}"]`); if(status){ status.textContent=count===0?'ELIMINADO':`${count} ${count===1?'vida':'vidas'}`; status.classList.toggle('eliminated',count===0); } if(count===0&&!eliminationOrder.includes(id)) eliminationOrder.push(id); if(count>0) eliminationOrder=eliminationOrder.filter(x=>x!==id); updateRegisterAvailability(); }
+  const lb=e.target.closest('[data-life-player]'); if(lb){ const id=lb.dataset.lifePlayer, idx=Number(lb.dataset.lifeIndex); const state=liarState[id]; state[idx]=!state[idx]; lb.classList.toggle('lost',!state[idx]); const count=state.filter(Boolean).length; scores[id]=count; const status=scoresList.querySelector(`[data-special-status="${id}"]`); if(selectedLiarMode==='add'){ const completed=count===selectedLiarLives; if(status){ status.textContent=completed?'COMPLETADO':`${count} / ${selectedLiarLives} corazones`; status.classList.remove('eliminated'); status.classList.toggle('completed',completed); } if(completed&&!liarCompletionOrder.includes(id)) liarCompletionOrder.push(id); if(!completed) liarCompletionOrder=liarCompletionOrder.filter(x=>x!==id); } else { if(status){ status.textContent=count===0?'ELIMINADO':`${count} ${count===1?'vida':'vidas'}`; status.classList.toggle('eliminated',count===0); status.classList.remove('completed'); } if(count===0&&!eliminationOrder.includes(id)) eliminationOrder.push(id); if(count>0) eliminationOrder=eliminationOrder.filter(x=>x!==id); } updateRegisterAvailability(); }
 });
 scoresBack.addEventListener('click',()=>{ scoresView.classList.remove('active'); drawView.classList.add('active'); resetViewScroll(drawView); });
 finishGameBtn.addEventListener('click',()=>{ manuallyFinished=true; finishGameBtn.classList.add('finished'); finishGameBtn.textContent='FINALIZADO ✓'; updateRegisterAvailability(); });
-function updateRegisterAvailability(){ if(!currentGame) return; const cfg=scoreConfigForGame(currentGame); let can=false; if(cfg.type==='score'){ can=manuallyFinished||Object.values(scores).some(v=>v>=cfg.target); registerHint.textContent=can?'Resultados listos para registrar.':`Alguien debe llegar a ${cfg.target} o puedes finalizar el juego.`; } else if(cfg.type==='fixedPercent'){ const reached=Object.values(scores).some(v=>v>=6); can=manuallyFinished||reached; registerHint.textContent=can?(reached?'Resultado listo. Al registrar indicarás 6 de cuántos tiros.':'Resultados listos para registrar.'):'Alguien debe llegar a 6 o puedes finalizar el juego.'; } else if(cfg.type==='variablePercent'){ can=manuallyFinished; if(can) registerHint.textContent='Resultados listos para registrar.'; } else if(cfg.type==='horse'){ const alive=currentOrder.filter(p=>(horseState[p.id]||[]).filter(Boolean).length<5); can=alive.length===1; registerHint.textContent=can?`${alive[0].name} es el último jugador en pie.`:'Elimina jugadores completando HORSE hasta que quede uno.'; } else if(cfg.type==='liar'){ const alive=currentOrder.filter(p=>(liarState[p.id]||[]).filter(Boolean).length>0); can=alive.length===1; registerHint.textContent=can?`${alive[0].name} es el último con vidas.`:'Elimina vidas hasta que quede un único jugador.'; } registerResultsBtn.disabled=!can; }
+function updateRegisterAvailability(){ if(!currentGame) return; const cfg=scoreConfigForGame(currentGame); let can=false; if(cfg.type==='score'){ can=manuallyFinished||Object.values(scores).some(v=>v>=cfg.target); registerHint.textContent=can?'Resultados listos para registrar.':`Alguien debe llegar a ${cfg.target} o puedes finalizar el juego.`; } else if(cfg.type==='fixedPercent'){ const reached=Object.values(scores).some(v=>v>=6); can=manuallyFinished||reached; registerHint.textContent=can?(reached?'Resultado listo. Al registrar indicarás 6 de cuántos tiros.':'Resultados listos para registrar.'):'Alguien debe llegar a 6 o puedes finalizar el juego.'; } else if(cfg.type==='variablePercent'){ can=manuallyFinished; if(can) registerHint.textContent='Resultados listos para registrar.'; } else if(cfg.type==='horse'){ const alive=currentOrder.filter(p=>(horseState[p.id]||[]).filter(Boolean).length<5); can=alive.length===1; registerHint.textContent=can?`${alive[0].name} es el último jugador en pie.`:'Elimina jugadores completando HORSE hasta que quede uno.'; } else if(cfg.type==='liar'){ if(selectedLiarMode==='add'){ const completed=liarCompletionOrder.filter(id=>(liarState[id]||[]).filter(Boolean).length===selectedLiarLives); const winner=getPlayer(completed[0]); can=Boolean(winner); registerHint.textContent=can?`${winner.name} ha completado todos los corazones.`:'Activa corazones hasta que alguien complete todos.'; } else { const alive=currentOrder.filter(p=>(liarState[p.id]||[]).filter(Boolean).length>0); can=alive.length===1; registerHint.textContent=can?`${alive[0].name} es el último con vidas.`:'Elimina vidas hasta que quede un único jugador.'; } } registerResultsBtn.disabled=!can; }
 function metricForPlayer(id,cfg){ const v=Number(scores[id]||0); if(cfg.type==='fixedPercent') return selectedFtAttempts?v/selectedFtAttempts:0; if(cfg.type==='variablePercent'){ const a=percentageAttempts[id]||1; return v/a; } return v; }
-function buildRanking(cfg){ if(cfg.type==='horse'){ const alive=currentOrder.filter(p=>(horseState[p.id]||[]).filter(Boolean).length<5); const winner=alive[0]; const eliminated=[...eliminationOrder].reverse().filter(id=>id!==winner?.id); return [winner?.id,...eliminated].filter(Boolean).map(id=>({id,metric:0,score:Number(scores[id]||0)})); } if(cfg.type==='liar'){ const alive=currentOrder.filter(p=>(liarState[p.id]||[]).filter(Boolean).length>0); const winner=alive[0]; const eliminated=[...eliminationOrder].reverse().filter(id=>id!==winner?.id); return [winner?.id,...eliminated].filter(Boolean).map(id=>({id,metric:Number(scores[id]||0),score:Number(scores[id]||0)})); } return currentOrder.map(p=>({id:p.id,metric:metricForPlayer(p.id,cfg),score:Number(scores[p.id]||0)})).sort((a,b)=>{ if(b.metric!==a.metric) return b.metric-a.metric; if(b.score!==a.score) return b.score-a.score; return currentOrder.findIndex(p=>p.id===a.id)-currentOrder.findIndex(p=>p.id===b.id); }); }
+function buildRanking(cfg){ if(cfg.type==='horse'){ const alive=currentOrder.filter(p=>(horseState[p.id]||[]).filter(Boolean).length<5); const winner=alive[0]; const eliminated=[...eliminationOrder].reverse().filter(id=>id!==winner?.id); return [winner?.id,...eliminated].filter(Boolean).map(id=>({id,metric:0,score:Number(scores[id]||0)})); } if(cfg.type==='liar'){ if(selectedLiarMode==='add'){ const validFinishes=liarCompletionOrder.filter(id=>(liarState[id]||[]).filter(Boolean).length===selectedLiarLives); const winnerId=validFinishes[0]; const finishPosition=new Map(validFinishes.map((id,i)=>[id,i])); const rest=currentOrder.map(p=>p.id).filter(id=>id!==winnerId).sort((a,b)=>{ const fa=finishPosition.has(a)?finishPosition.get(a):Number.MAX_SAFE_INTEGER, fb=finishPosition.has(b)?finishPosition.get(b):Number.MAX_SAFE_INTEGER; if(fa!==fb) return fa-fb; const diff=Number(scores[b]||0)-Number(scores[a]||0); return diff||currentOrder.findIndex(p=>p.id===a)-currentOrder.findIndex(p=>p.id===b); }); return [winnerId,...rest].filter(Boolean).map(id=>({id,metric:Number(scores[id]||0),score:Number(scores[id]||0)})); } const alive=currentOrder.filter(p=>(liarState[p.id]||[]).filter(Boolean).length>0); const winner=alive[0]; const eliminated=[...eliminationOrder].reverse().filter(id=>id!==winner?.id); return [winner?.id,...eliminated].filter(Boolean).map(id=>({id,metric:Number(scores[id]||0),score:Number(scores[id]||0)})); } return currentOrder.map(p=>({id:p.id,metric:metricForPlayer(p.id,cfg),score:Number(scores[p.id]||0)})).sort((a,b)=>{ if(b.metric!==a.metric) return b.metric-a.metric; if(b.score!==a.score) return b.score-a.score; return currentOrder.findIndex(p=>p.id===a.id)-currentOrder.findIndex(p=>p.id===b.id); }); }
 function persistResultEntry(entry,winnerIds){
   const clean=[...new Set((winnerIds||[]).filter(Boolean))];
   entry.winnerIds=clean;
@@ -2141,13 +2219,13 @@ ftWinnerChoices.addEventListener('click',e=>{ const btn=e.target.closest('[data-
 ftTiebreakRows.addEventListener('input',e=>{ if(!ftResolutionState)return; const made=e.target.closest('[data-ft-tb-made]'), attempts=e.target.closest('[data-ft-tb-attempts]'); const id=made?.dataset.ftTbMade||attempts?.dataset.ftTbAttempts; if(!id)return; const tb=ftResolutionState.tiebreak[id]||(ftResolutionState.tiebreak[id]={made:0,attempts:0}); if(made)tb.made=Number(made.value); if(attempts)tb.attempts=Number(attempts.value); ftResolutionError.textContent=''; });
 ftResolutionConfirm.addEventListener('click',()=>finalizeFtResolution());
 ftResolutionCancel.addEventListener('click',closeFtResolution);
-function registerResults(){ if(!currentGame||registerResultsBtn.disabled) return; const cfg=scoreConfigForGame(currentGame); if(cfg.type==='fixedPercent'){ beginFtResolution(); return; } const ranking=buildRanking(cfg); let candidateWinnerIds=[]; if(cfg.type==='horse'||cfg.type==='liar') candidateWinnerIds=ranking.length?[ranking[0].id]:[]; else { const best=ranking[0]?.metric ?? 0; candidateWinnerIds=ranking.filter(r=>Math.abs(r.metric-best)<1e-12).map(r=>r.id); } const entry={ date:new Date().toISOString(), gameId:currentGame.id, gameTitle:currentGame.title, mode:cfg.type, scores:{...scores}, ftAttempts:selectedFtAttempts, percentageAttempts:{...percentageAttempts}, ranking, winnerId:null, winnerIds:[], horseState:JSON.parse(JSON.stringify(horseState)), liarState:JSON.parse(JSON.stringify(liarState)), liarLives:selectedLiarLives };
+function registerResults(){ if(!currentGame||registerResultsBtn.disabled) return; const cfg=scoreConfigForGame(currentGame); if(cfg.type==='fixedPercent'){ beginFtResolution(); return; } const ranking=buildRanking(cfg); let candidateWinnerIds=[]; if(cfg.type==='horse'||cfg.type==='liar') candidateWinnerIds=ranking.length?[ranking[0].id]:[]; else { const best=ranking[0]?.metric ?? 0; candidateWinnerIds=ranking.filter(r=>Math.abs(r.metric-best)<1e-12).map(r=>r.id); } const entry={ date:new Date().toISOString(), gameId:currentGame.id, gameTitle:currentGame.title, mode:cfg.type, scores:{...scores}, ftAttempts:selectedFtAttempts, percentageAttempts:{...percentageAttempts}, ranking, winnerId:null, winnerIds:[], horseState:JSON.parse(JSON.stringify(horseState)), liarState:JSON.parse(JSON.stringify(liarState)), liarLives:selectedLiarLives, liarMode:cfg.type==='liar'?selectedLiarMode:null };
   if(candidateWinnerIds.length>1){ openTieChooser(entry,candidateWinnerIds); return; }
   persistResultEntry(entry,candidateWinnerIds);
 }
 
 registerResultsBtn.addEventListener('click',registerResults);
-function scoreTextFor(entry,id){ const v=Number((entry.scores||{})[id]||0); if(entry.mode==='fixedPercent'){ const a=ftAttemptsForEntry(entry,id), tb=entry.ftTiebreak?.players?.[id]; const extra=tb?` · desempate ${tb.made}/${tb.attempts}`:''; return `${v}/${a} · ${fmtPct(a?v/a*100:0)}${extra}`; } if(entry.mode==='variablePercent'){ const a=Number((entry.percentageAttempts||{})[id]||0); return `${fmtPct(a?v/a*100:0)}`; } if(entry.mode==='horse') return v>=5?'HORSE':'En juego'; if(entry.mode==='liar') return `${v} ${v===1?'vida':'vidas'}`; if(entry.mode==='territory') return `${v} ${v===1?'posta':'postas'}`; return `${v}`; }
+function scoreTextFor(entry,id){ const v=Number((entry.scores||{})[id]||0); if(entry.mode==='fixedPercent'){ const a=ftAttemptsForEntry(entry,id), tb=entry.ftTiebreak?.players?.[id]; const extra=tb?` · desempate ${tb.made}/${tb.attempts}`:''; return `${v}/${a} · ${fmtPct(a?v/a*100:0)}${extra}`; } if(entry.mode==='variablePercent'){ const a=Number((entry.percentageAttempts||{})[id]||0); return `${fmtPct(a?v/a*100:0)}`; } if(entry.mode==='horse') return v>=5?'HORSE':'En juego'; if(entry.mode==='liar'){ if(entry.liarMode==='add') return `${v}/${Number(entry.liarLives||0)} corazones`; return `${v} ${v===1?'vida':'vidas'}`; } if(entry.mode==='territory') return `${v} ${v===1?'posta':'postas'}`; return `${v}`; }
 function winnerDisplayScore(entry,id){ return scoreTextFor(entry,id); }
 function openGameHistory(gameId){ currentGame=getGame(gameId); if(!currentGame) return; setImg(historyGameBanner,GAME_BANNERS[currentGame.title],currentGame.title); renderGameHistory(gameId); activateView(gameHistoryView); }
 function renderGameHistory(gameId){ const entries=(getHistoryStore()[gameId]||[]); if(!entries.length){ gameHistoryList.innerHTML='<div class="history-empty">Todavía no hay resultados registrados para este juego.</div>'; return; } const allWins={}; entries.forEach(e=>(e.winnerIds||[e.winnerId]).forEach(id=>allWins[id]=(allWins[id]||0)+1)); gameHistoryList.innerHTML=[...entries].reverse().map(e=>{ const ws=e.winnerIds||[e.winnerId]; const first=getPlayer(ws[0]); const winnerName=ws.length>1?`EMPATE: ${ws.map(id=>getPlayer(id)?.name||id).join(' / ')}`:(first?.name||'—'); const winnerScore=ws.length===1?scoreTextFor(e,ws[0]):ws.map(id=>scoreTextFor(e,id)).join(' · '); const firstWins=ws.length===1?`${allWins[ws[0]]||0} 🏆`:ws.map(id=>`${allWins[id]||0} 🏆`).join(' · '); const second=e.ranking?.[1], third=e.ranking?.[2]; const dt=new Date(e.date).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}); return `<article class="history-entry"><div class="history-date">${dt}</div><div class="history-winner" style="--c1:${first?.c1||'#444'};--c2:${first?.c2||'#222'}"><span class="history-winner-name">${winnerName.toUpperCase()}</span><span class="history-win-count">${firstWins}</span></div><div class="history-winner-score">${winnerScore}</div><div class="history-places">${second?`<div>2.º <strong>${getPlayer(second.id)?.name||second.id}</strong> · <span class="history-score">${scoreTextFor(e,second.id)}</span></div>`:''}${third?`<div>3.º <strong>${getPlayer(third.id)?.name||third.id}</strong> · <span class="history-score">${scoreTextFor(e,third.id)}</span></div>`:''}</div></article>`; }).join(''); }
@@ -2177,6 +2255,7 @@ function renderMeta(type){ const entries=allEntries().slice().sort((a,b)=>new Da
 numberToolBack.addEventListener('click',goHome);
 percentToolBack.addEventListener('click',goHome);
 rouletteBack.addEventListener('click',goHome);
+stopwatchBack.addEventListener('click',goHome);
 function generateRandomNumbers(){ let min=parseInt(randMin.value||'0',10), max=parseInt(randMax.value||'0',10), count=parseInt(randCount.value||'1',10); if(min>max) [min,max]=[max,min]; count=clamp(isNaN(count)?1:count,1,20); randCount.value=count; const size=max-min+1; const nums=[]; if(size>=count){ const pool=Array.from({length:size},(_,i)=>min+i); for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; } nums.push(...pool.slice(0,count)); } else { for(let i=0;i<count;i++) nums.push(min+Math.floor(Math.random()*size)); }
   randResults.className='number-results'+(count===1?' one':'');
   randResults.innerHTML=nums.map(n=>`<div class="number-chip">${n}</div>`).join(''); randResetBtn.classList.add('show'); }
@@ -2199,6 +2278,72 @@ function spinRoulette(){
   setTimeout(()=>{ rouletteSpinning=false; targetCard.classList.add('selected'); const g=getGame(rouletteChosenId); rouletteResultName.textContent=g.title.toUpperCase(); rouletteResult.classList.add('active'); },2700);
 }
 spinWheelBtn.addEventListener('click',spinRoulette); rouletteOtherBtn.addEventListener('click',()=>{ renderSlotTrack(); requestAnimationFrame(spinRoulette); }); roulettePlayBtn.addEventListener('click',()=>{ if(rouletteChosenId) openGameDetail(rouletteChosenId); });
+
+function stopwatchElapsed(){ return stopwatchAccumulatedMs+(stopwatchRunning?Date.now()-stopwatchStartedAt:0); }
+function formatStopwatch(ms){
+  const safe=Math.max(0,Math.floor(ms));
+  const hours=Math.floor(safe/3600000);
+  const minutes=Math.floor((safe%3600000)/60000);
+  const seconds=Math.floor((safe%60000)/1000);
+  const centiseconds=Math.floor((safe%1000)/10);
+  const tail=`${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}.${String(centiseconds).padStart(2,'0')}`;
+  return hours?`${String(hours).padStart(2,'0')}:${tail}`:tail;
+}
+function renderStopwatchLaps(){
+  if(!stopwatchLapTotals.length){ stopwatchLaps.innerHTML='<div class="stopwatch-empty">Todavía no hay vueltas.</div>'; return; }
+  stopwatchLaps.innerHTML=stopwatchLapTotals.map((total,i)=>({number:i+1,total,split:total-(stopwatchLapTotals[i-1]||0)})).reverse().map(lap=>`<div class="stopwatch-lap"><strong>VUELTA ${lap.number}</strong><span>${formatStopwatch(lap.split)}</span><span class="lap-total">${formatStopwatch(lap.total)}</span></div>`).join('');
+}
+function renderStopwatch(){
+  const elapsed=stopwatchElapsed();
+  stopwatchDisplay.textContent=formatStopwatch(elapsed);
+  stopwatchStatus.textContent=stopwatchRunning?'EN MARCHA':(elapsed?'PAUSADO':'LISTO');
+  stopwatchStatus.classList.toggle('running',stopwatchRunning);
+  stopwatchStartBtn.querySelector('span').textContent=stopwatchRunning?'PAUSAR':'INICIAR';
+  stopwatchLapBtn.disabled=!stopwatchRunning;
+  stopwatchResetBtn.disabled=stopwatchRunning||elapsed===0;
+}
+function stopwatchTick(){
+  stopwatchFrame=null;
+  renderStopwatch();
+  if(stopwatchRunning&&stopwatchView.classList.contains('active')) stopwatchFrame=requestAnimationFrame(stopwatchTick);
+}
+function openStopwatch(){
+  setTexture(stopwatchStartBtn);
+  renderStopwatch();
+  renderStopwatchLaps();
+  activateView(stopwatchView);
+  if(stopwatchRunning&&!stopwatchFrame) stopwatchFrame=requestAnimationFrame(stopwatchTick);
+}
+function toggleStopwatch(){
+  if(stopwatchRunning){
+    stopwatchAccumulatedMs=stopwatchElapsed();
+    stopwatchRunning=false;
+    stopwatchStartedAt=0;
+    if(stopwatchFrame){ cancelAnimationFrame(stopwatchFrame); stopwatchFrame=null; }
+    renderStopwatch();
+    return;
+  }
+  stopwatchStartedAt=Date.now();
+  stopwatchRunning=true;
+  renderStopwatch();
+  if(!stopwatchFrame) stopwatchFrame=requestAnimationFrame(stopwatchTick);
+}
+function addStopwatchLap(){
+  if(!stopwatchRunning) return;
+  stopwatchLapTotals.push(stopwatchElapsed());
+  renderStopwatchLaps();
+}
+function resetStopwatch(){
+  if(stopwatchRunning) return;
+  stopwatchAccumulatedMs=0;
+  stopwatchStartedAt=0;
+  stopwatchLapTotals=[];
+  renderStopwatch();
+  renderStopwatchLaps();
+}
+stopwatchStartBtn.addEventListener('click',toggleStopwatch);
+stopwatchLapBtn.addEventListener('click',addStopwatchLap);
+stopwatchResetBtn.addEventListener('click',resetStopwatch);
 
 function showWinnerCelebration(entry){ const ws=entry.winnerIds.map(getPlayer).filter(Boolean); const first=ws[0]||{c1:'#6830d5',c2:'#bf55ff',name:'—'}; winnerName.style.setProperty('--wc1',first.c1); winnerName.style.setProperty('--wc2',first.c2); winnerName.textContent=ws.length>1?ws.map(p=>p.name.toUpperCase()).join(' / '):first.name.toUpperCase(); winnerKicker.textContent=ws.length>1?'EMPATE':'GANADOR'; winnerSub.textContent='RESULTADO REGISTRADO'; setImg(winnerGameBanner,GAME_BANNERS[currentGame.title],currentGame.title); winnerView.classList.add('active'); winnerView.setAttribute('aria-hidden','false'); winnerView.scrollTop=0; setTimeout(()=>goHome(),2000); }
 
@@ -2751,6 +2896,7 @@ document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
     '.player-select-view.active','.draw-view.active','.scores-view.active',
     '.game-history-view.active','.meta-view.active','.player-detail-view.active',
     '.number-tool-view.active','.percent-tool-view.active','.roulette-view.active',
+    '.stopwatch-view.active',
     '.territory-view.active','.winner-view.active'
   ].join(',');
   window.blHandleAndroidBack=function(){
